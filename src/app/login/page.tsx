@@ -1,10 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, useReducedMotion, type Transition } from "motion/react";
-import { DialRoot, useDialKitController } from "dialkit";
-import "dialkit/styles.css";
 import LogoAnimated from "@/components/LogoAnimated";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,85 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 
-/* ─────────────────────────────────────────────────────────
- * LOGIN INTRO — ANIMATION STORYBOARD
- *
- *    0ms   logo storyboard plays, large, centered on screen
- *          (tile pop → eyes blink in → glance → letters)
- * logoDone hold a beat, let the mascot land
- *  + hold  logo shrinks & glides into the card header (spring)
- *  + card  login card rises in underneath
- *
- * Every timing is live-tunable via the DialKit panel (dev
- * only). Reduced motion: skip straight to the end state.
- * ───────────────────────────────────────────────────────── */
-
-const SLOT = 40; // logo size once docked in the card header
-
-function toMotion(curve: { type: string; [k: string]: unknown }): Transition {
-  return curve.type === "easing"
-    ? {
-        type: "tween",
-        duration: curve.duration as number,
-        ease: curve.ease as [number, number, number, number],
-      }
-    : (curve as unknown as Transition);
-}
-
 export default function Login() {
   const router = useRouter();
-  const reduced = useReducedMotion() ?? false;
-
-  const dial = useDialKitController(
-    "Login Intro",
-    {
-      startScale: [1.6, 1, 2.6, 0.05],
-      logoDone: [1.9, 0.5, 4, 0.05],
-      holdBeat: [0.35, 0, 1.5, 0.05],
-      dockSpring: { type: "spring", visualDuration: 0.65, bounce: 0.22 },
-      cardDelay: [0.18, 0, 1, 0.02],
-      cardSpring: { type: "spring", visualDuration: 0.5, bounce: 0.18 },
-      replay: { type: "action", label: "Replay intro" },
-    },
-    {
-      id: "sobre-login-intro",
-      onAction: () => setRun((n) => n + 1),
-    }
-  );
-  const p = dial.values;
-
-  // stage machine: center → dock (card enters alongside); `run` replays
-  const [run, setRun] = useState(0);
-  const [stage, setStage] = useState<"center" | "dock">("center");
-  const [delta, setDelta] = useState<{ x: number; y: number } | null>(null);
-  const heroRef = useRef<HTMLDivElement>(null);
-  const slotRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (reduced) {
-      setStage("dock");
-      return;
-    }
-    setStage("center");
-    setDelta(null);
-    const t = setTimeout(() => {
-      const hero = heroRef.current?.getBoundingClientRect();
-      const slot = slotRef.current?.getBoundingClientRect();
-      if (hero && slot) {
-        setDelta({
-          x: slot.left + slot.width / 2 - (hero.left + hero.width / 2),
-          y: slot.top + slot.height / 2 - (hero.top + hero.height / 2),
-        });
-      }
-      setStage("dock");
-    }, (p.logoDone + p.holdBeat) * 1000);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [run, reduced]);
-
-  const docked = stage === "dock";
-
-  // ── auth ──
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -110,6 +30,7 @@ export default function Login() {
       setBusy(false);
       setError(error.message);
     }
+    // success: browser navigates to Google
   }
 
   async function submit(e: React.FormEvent) {
@@ -125,6 +46,7 @@ export default function Login() {
     setBusy(false);
     if (error) return setError(error.message);
     if (!data.session) {
+      // email confirmation is on: no session until the link is clicked
       setMode("signin");
       setNotice(
         "Almost there — check your email for the confirmation link, then come back and sign in."
@@ -137,42 +59,12 @@ export default function Login() {
 
   return (
     <main className="flex min-h-dvh items-center justify-center p-6">
-      <DialRoot position="top-right" />
-
-      {/* the travelling brand: starts huge & centered, docks into the card */}
-      <div className="pointer-events-none fixed inset-0 z-20 flex items-center justify-center">
-        <motion.div
-          ref={heroRef}
-          initial={false}
-          animate={
-            docked && delta
-              ? { x: delta.x, y: delta.y, scale: SLOT / 64 }
-              : { x: 0, y: 0, scale: reduced ? SLOT / 64 : p.startScale }
-          }
-          transition={reduced ? { duration: 0 } : toMotion(p.dockSpring)}
-        >
-          <LogoAnimated key={`logo-${run}`} size={64} className="text-3xl" />
-        </motion.div>
-      </div>
-
-      <motion.div
-        className="w-full max-w-sm"
-        initial={reduced ? false : { opacity: 0, y: 28 }}
-        animate={docked ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
-        transition={
-          reduced
-            ? { duration: 0 }
-            : { ...toMotion(p.cardSpring), delay: p.cardDelay }
-        }
-      >
+      <div className="w-full max-w-sm space-y-6">
+        <div className="flex justify-center">
+          <LogoAnimated size={40} className="text-2xl" />
+        </div>
         <Card className="py-5 shadow-sm">
           <CardContent className="px-5">
-            {/* landing slot for the brand — reserves the header space */}
-            <div
-              ref={slotRef}
-              className="mx-auto mb-5 flex h-10 w-40 items-center justify-center"
-              aria-hidden
-            />
             <Button
               type="button"
               variant="outline"
@@ -254,10 +146,10 @@ export default function Login() {
             </button>
           </CardContent>
         </Card>
-        <p className="mt-6 text-center text-[11px] text-muted-foreground">
+        <p className="text-center text-[11px] text-muted-foreground">
           Every peso, spoken for.
         </p>
-      </motion.div>
+      </div>
     </main>
   );
 }
