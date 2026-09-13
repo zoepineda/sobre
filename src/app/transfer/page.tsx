@@ -2,6 +2,7 @@ import { getAccounts, getCategories } from "@/lib/queries";
 import Link from "next/link";
 import { addTransfer } from "@/lib/actions";
 import BrandChip from "@/components/BrandChip";
+import EnvelopeOption from "@/components/EnvelopeOption";
 import { todayISO } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -57,11 +58,17 @@ export default async function Transfer({
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {categories.map((c) => (
-          <SelectItem key={c.id} value={String(c.id)}>
-            {c.name}
-          </SelectItem>
-        ))}
+        {categories.map((c) => {
+          const home = allAccounts.find((a) => a.id === c.payday_account_id);
+          return (
+            <EnvelopeOption
+              key={c.id}
+              id={c.id}
+              name={c.name}
+              home={home ? { name: home.name, type: home.type } : null}
+            />
+          );
+        })}
       </SelectContent>
     </Select>
   );

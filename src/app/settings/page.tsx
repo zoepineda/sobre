@@ -13,6 +13,7 @@ import AddDialog from "@/components/AddDialog";
 import AddEnvelopeForm from "@/components/AddEnvelopeForm";
 import ArchiveDelete from "@/components/ArchiveDelete";
 import BrandChip from "@/components/BrandChip";
+import EnvelopeOption from "@/components/EnvelopeOption";
 import EnvelopeList from "@/components/EnvelopeList";
 import SetupAccountList from "@/components/SetupAccountList";
 import SetupTour from "@/components/SetupTour";
@@ -275,11 +276,23 @@ export default async function Settings({
                   <SelectContent>
                     {categories
                       .filter((c) => !c.is_system)
-                      .map((c) => (
-                        <SelectItem key={c.id} value={String(c.id)}>
-                          {c.name}
-                        </SelectItem>
-                      ))}
+                      .map((c) => {
+                        const home = accounts.find(
+                          (a) => a.id === c.payday_account_id
+                        );
+                        return (
+                          <EnvelopeOption
+                            key={c.id}
+                            id={c.id}
+                            name={c.name}
+                            home={
+                              home
+                                ? { name: home.name, type: home.type }
+                                : null
+                            }
+                          />
+                        );
+                      })}
                   </SelectContent>
                 </Select>
               </div>

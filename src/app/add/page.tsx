@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { getAccounts, getCategories, getPayeeSuggestions } from "@/lib/queries";
+import BrandChip from "@/components/BrandChip";
+import EnvelopeOption from "@/components/EnvelopeOption";
 import ItemsEditor from "@/components/ItemsEditor";
 import { addExpense } from "@/lib/actions";
 import { todayISO } from "@/lib/format";
@@ -91,8 +93,11 @@ export default async function AddExpense() {
                 <SelectContent>
                   {accounts.map((a) => (
                     <SelectItem key={a.id} value={String(a.id)}>
-                      {a.name}
-                      {a.type === "credit_card" ? " 💳" : ""}
+                      <span className="flex items-center gap-2">
+                        <BrandChip name={a.name} type={a.type} />
+                        {a.name}
+                        {a.type === "credit_card" ? " 💳" : ""}
+                      </span>
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -112,11 +117,19 @@ export default async function AddExpense() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((c) => (
-                    <SelectItem key={c.id} value={String(c.id)}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
+                  {categories.map((c) => {
+                    const home = accounts.find(
+                      (a) => a.id === c.payday_account_id
+                    );
+                    return (
+                      <EnvelopeOption
+                        key={c.id}
+                        id={c.id}
+                        name={c.name}
+                        home={home ? { name: home.name, type: home.type } : null}
+                      />
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </div>
