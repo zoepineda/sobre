@@ -72,13 +72,19 @@ export default async function Settings({
         <SetupTour />
       </div>
 
-      {error && (
+      {error === "account-in-use" ? (
+        <p className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
+          Envelopes or bills still use that account as their payday home —
+          point them somewhere else (tap the envelope to edit) before
+          archiving it.
+        </p>
+      ) : error ? (
         <p className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
           That {error} still holds money — move its balance elsewhere (or pay
           off the card) before archiving, so nothing disappears from your
           totals.
         </p>
-      )}
+      ) : null}
 
       {hiddenMoney.length > 0 && (
         <Card className="border-destructive/40 py-4 shadow-sm">

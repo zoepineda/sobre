@@ -98,9 +98,11 @@ export async function logPayday(formData: FormData) {
   const uid = await getUserId();
   const date = (formData.get("date") as string) || todayISO();
   const rows = (await sql`
-    SELECT id, payday_target, payday_account_id FROM categories
-    WHERE user_id = ${uid} AND archived = false AND is_system = false
-      AND payday_target > 0 AND payday_account_id IS NOT NULL`) as unknown as {
+    SELECT c.id, c.payday_target, c.payday_account_id
+    FROM categories c
+    JOIN accounts a ON a.id = c.payday_account_id AND a.archived = false
+    WHERE c.user_id = ${uid} AND c.archived = false AND c.is_system = false
+      AND c.payday_target > 0`) as unknown as {
     id: number;
     payday_target: number;
     payday_account_id: number;
@@ -337,6 +339,15 @@ export async function archiveAccount(formData: FormData) {
     WHERE account_id = ${id} AND user_id = ${uid}`) as unknown as { b: number }[];
   if (b !== 0) {
     done("/settings?error=account");
+    return;
+  }
+  const [{ refs }] = (await sql`
+    SELECT (
+      (SELECT COUNT(*) FROM categories WHERE user_id = ${uid} AND archived = false AND payday_account_id = ${id})
+      + (SELECT COUNT(*) FROM bills WHERE user_id = ${uid} AND archived = false AND account_id = ${id})
+    )::int AS refs`) as unknown as { refs: number }[];
+  if (refs > 0) {
+    done("/settings?error=account-in-use");
     return;
   }
   await sql`UPDATE accounts SET archived = true WHERE id = ${id} AND user_id = ${uid}`;
