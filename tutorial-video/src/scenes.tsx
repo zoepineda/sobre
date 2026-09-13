@@ -139,14 +139,69 @@ export const Accounts: React.FC<{ duration: number }> = ({ duration }) => {
 };
 
 // ── 3. The envelope concept ──
+/* ─────────────────────────────────────────────────────────
+ * ENVELOPE CONCEPT — ANIMATION STORYBOARD
+ *
+ *    f0    title rail rises (step / heading / body)
+ *    f6    Total-cash card rises in
+ *   f24+   row names appear at ₱0.00, one per beat
+ *   f26+   an amber amount-pill launches from the card,
+ *          arcs down, and lands in its row (13f apart)
+ *   land   row balance counts up from ₱0.00 as the pill sinks in
+ *  f116    footer: "5 envelopes = your total, to the centavo"
+ * ───────────────────────────────────────────────────────── */
+const ENV_TIMING = {
+  card: 6,
+  firstLaunch: 26,
+  perRow: 13,
+  flight: 14,
+  countUp: 12,
+  footer: 116,
+};
+const ENV_ROWS = [
+  { name: "Savings", amount: 60000 },
+  { name: "Rent", amount: 18000 },
+  { name: "Food Fund", amount: 6500 },
+  { name: "Travel Fund", amount: 25210.24 },
+  { name: "Wants Budget", amount: 2480.12 },
+];
+// right-column geometry (px, within the 560-wide relative wrapper)
+const ENV_GEO = { cardH: 132, gap: 26, rowH: 79, pillStartY: 96 };
+
+const pesoFmt = (v: number) =>
+  "₱" +
+  v.toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 export const Envelopes: React.FC<{ duration: number }> = ({ duration }) => {
-  const rows = [
-    ["Savings", "₱60,000.00"],
-    ["Rent", "₱18,000.00"],
-    ["Food Fund", "₱6,500.00"],
-    ["Travel Fund", "₱25,210.24"],
-    ["Wants Budget", "₱2,480.12"],
-  ] as const;
+  const frame = useCurrentFrame();
+  const T = ENV_TIMING;
+  const G = ENV_GEO;
+  const panelTop = G.cardH + G.gap;
+
+  const rows = ENV_ROWS.map((row, i) => {
+    const launch = T.firstLaunch + i * T.perRow;
+    const land = launch + T.flight;
+    const t = interpolate(frame, [launch, land], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+    const flying = frame >= launch && frame <= land + 3;
+    // arc: x eases out toward the amount column, y accelerates downward
+    const x = interpolate(Math.sin((t * Math.PI) / 2), [0, 1], [252, 420]);
+    const y = interpolate(t * t, [0, 1], [G.pillStartY, panelTop + i * G.rowH + 22]);
+    const pillFade = interpolate(
+      frame,
+      [launch, launch + 3, land, land + 3],
+      [0, 1, 1, 0],
+      { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+    );
+    const counted = interpolate(frame, [land, land + T.countUp], [0, row.amount], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+    return { ...row, i, launch, flying, x, y, pillFade, counted };
+  });
+
   return (
     <Stage>
       <AbsoluteFill style={{ opacity: useFadeOut(duration) }}>
@@ -159,44 +214,75 @@ export const Envelopes: React.FC<{ duration: number }> = ({ duration }) => {
             />
           }
           right={
-            <div style={{ display: "flex", flexDirection: "column", gap: 26, alignItems: "stretch", width: 560 }}>
-              <Rise delay={6}>
+            <div style={{ position: "relative", width: 560 }}>
+              <Rise delay={T.card}>
                 <div
                   style={{
+                    height: G.cardH,
                     borderRadius: 22,
                     background: PINE,
                     color: "#fff",
-                    padding: "26px 30px",
+                    padding: "24px 30px",
                     fontFamily: BODY,
                     boxShadow: "0 16px 40px rgba(26,29,36,0.24)",
+                    boxSizing: "border-box",
                   }}
                 >
                   <div style={{ fontSize: 20, opacity: 0.7, letterSpacing: 3, textTransform: "uppercase" }}>
                     Total cash
                   </div>
-                  <div style={{ fontWeight: 700, fontSize: 48, marginTop: 4 }}>₱112,190.36</div>
+                  <div style={{ fontWeight: 700, fontSize: 46, marginTop: 2 }}>₱112,190.36</div>
                 </div>
               </Rise>
-              <Panel width={560}>
-                {rows.map(([name, amount], i) => (
-                  <Rise key={name} delay={18 + i * 8}>
-                    <EnvelopeRow name={name} amount={amount} />
+              <div style={{ marginTop: G.gap }}>
+                <Panel width={560}>
+                  {rows.map((r) => (
+                    <Rise key={r.name} delay={r.launch - 2}>
+                      <EnvelopeRow name={r.name} amount={pesoFmt(r.counted)} />
+                    </Rise>
+                  ))}
+                  <Rise delay={T.footer}>
+                    <div
+                      style={{
+                        padding: "18px 28px",
+                        fontFamily: BODY,
+                        fontSize: 22,
+                        color: MUTED,
+                        background: "rgba(47,111,79,0.07)",
+                      }}
+                    >
+                      5 envelopes = ₱112,190.36. Always, to the centavo.
+                    </div>
                   </Rise>
-                ))}
-                <Rise delay={64}>
-                  <div
-                    style={{
-                      padding: "18px 28px",
-                      fontFamily: BODY,
-                      fontSize: 22,
-                      color: MUTED,
-                      background: "rgba(47,111,79,0.07)",
-                    }}
-                  >
-                    5 envelopes = ₱112,190.36. Always, to the centavo.
-                  </div>
-                </Rise>
-              </Panel>
+                </Panel>
+              </div>
+              {/* the flying amount-pills: money leaving the pile, landing in rows */}
+              {rows.map(
+                (r) =>
+                  r.flying && (
+                    <div
+                      key={`pill-${r.name}`}
+                      style={{
+                        position: "absolute",
+                        left: r.x,
+                        top: r.y,
+                        transform: "translate(-50%, -50%)",
+                        background: "#ffb80a",
+                        color: INK,
+                        fontFamily: BODY,
+                        fontWeight: 700,
+                        fontSize: 21,
+                        padding: "8px 18px",
+                        borderRadius: 100,
+                        boxShadow: "0 8px 20px rgba(26,29,36,0.25)",
+                        opacity: r.pillFade,
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {pesoFmt(r.amount)}
+                    </div>
+                  )
+              )}
             </div>
           }
         />
