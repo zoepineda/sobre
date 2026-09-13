@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { brandCardLogo } from "@/lib/brandLogos";
 import { cardStyle } from "@/lib/cardStyles";
 import { peso } from "@/lib/format";
 import { SHADER_DEFS, recolor, useMotionPrefs, useShaderChoice } from "@/lib/paperShaders";
@@ -47,8 +48,19 @@ export default function AccountCard({
       )}
       <div className="relative flex items-start justify-between">
         <div>
-          <p className="text-sm font-bold leading-tight">{name}</p>
-          <p className="text-[10px] uppercase tracking-widest" style={{ color: s.sub }}>
+          {brandCardLogo(name) ? (
+            // white knockout, like real card printing
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`/brands/${brandCardLogo(name)}`}
+              alt={name}
+              className="h-4.5 w-auto max-w-[110px] object-contain object-left"
+              style={{ filter: "brightness(0) invert(1)", opacity: 0.95 }}
+            />
+          ) : (
+            <p className="text-sm font-bold leading-tight">{name}</p>
+          )}
+          <p className="mt-0.5 text-[10px] uppercase tracking-widest" style={{ color: s.sub }}>
             {isCard ? "credit" : type.replace("_", " ")}
           </p>
         </div>

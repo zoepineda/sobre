@@ -8,6 +8,7 @@ const BRANDS: {
   logo: string;
   color: string; // representative solid brand color, for tints
   chip?: BrandHit["chip"];
+  raster?: true; // embedded bitmap — can't be recolored via CSS filters
 }[] = [
   { match: /\bbpi\b/i, logo: "bpi.svg", color: "#b11116" },
   { match: /\bbdo\b/i, logo: "bdo.svg", color: "#0b2972" },
@@ -22,9 +23,9 @@ const BRANDS: {
   { match: /gotyme|go\s*tyme/i, logo: "gotyme.svg", color: "#00c9c0" },
   { match: /tonik/i, logo: "tonik.svg", color: "#7657f8" },
   { match: /seabank|sea\s*bank/i, logo: "seabank.svg", color: "#ee4d2d" },
-  { match: /\buno\b/i, logo: "uno.svg", color: "#7a4ff5" },
+  { match: /\buno\b/i, logo: "uno.svg", color: "#7a4ff5", raster: true },
   { match: /ownbank|own\s*bank/i, logo: "ownbank.svg", color: "#30ec5d", chip: "dark" },
-  { match: /komo/i, logo: "komo.svg", color: "#b91372" },
+  { match: /komo/i, logo: "komo.svg", color: "#b91372", raster: true },
   { match: /gcash/i, logo: "gcash.svg", color: "#007dfe" },
   { match: /maya/i, logo: "maya.svg", color: "#2fdf75", chip: "dark" },
   { match: /grab/i, logo: "grabpay.svg", color: "#00b14f" },
@@ -42,6 +43,13 @@ const TYPE_COLORS: Record<string, string> = {
 export function brandLogo(name: string): BrandHit | null {
   const hit = BRANDS.find((b) => b.match.test(name));
   return hit ? { logo: hit.logo, chip: hit.chip ?? "light" } : null;
+}
+
+// logo usable as a white-knockout mark on card gradients (pure vector only —
+// raster-embedded logos would turn into solid white blobs under the filter)
+export function brandCardLogo(name: string): string | null {
+  const hit = BRANDS.find((b) => b.match.test(name));
+  return hit && !hit.raster ? hit.logo : null;
 }
 
 export function brandColor(name: string, type: string): string {
