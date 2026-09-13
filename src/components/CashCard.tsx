@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ShaderSwatches from "@/components/ShaderSwatches";
 import { TiltCard } from "@/components/motion/tilt-card";
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import {
@@ -29,6 +30,7 @@ export default function CashCard({ totalCash }: { totalCash: number }) {
       )}
       {/* scrim so the numbers stay readable over busy shaders */}
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/35 to-transparent" />
+      <ShaderSwatches />
       <div className="relative">
         <p className="text-xs text-white/70">Total cash</p>
         <AnimatedCounter
