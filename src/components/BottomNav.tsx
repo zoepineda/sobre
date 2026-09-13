@@ -16,6 +16,7 @@ const tabs = [
 // Bottom tab bar on mobile; fixed left sidebar on desktop.
 export default function BottomNav() {
   const pathname = usePathname();
+  if (pathname.startsWith("/login")) return null;
   return (
     <nav className="fixed bottom-0 inset-x-0 z-10 border-t border-black/10 bg-card/95 backdrop-blur lg:inset-x-auto lg:left-0 lg:top-0 lg:bottom-0 lg:w-60 lg:border-t-0 lg:border-r">
       <div className="mx-auto grid max-w-md grid-cols-5 lg:flex lg:max-w-none lg:flex-col lg:gap-1 lg:p-4">

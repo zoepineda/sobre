@@ -2,35 +2,40 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import db from "./db";
+import { sql } from "./pg";
+import { getUserId } from "./supabase/server";
 import { toCentavos, todayISO } from "./format";
 
-function insertTransaction(
+type Line = { account_id: number; category_id: number; amount: number };
+type Item = { name: string; amount: number };
+
+async function insertTransaction(
+  uid: string,
   type: string,
   date: string,
   note: string,
-  lines: { account_id: number; category_id: number; amount: number }[],
+  lines: Line[],
   payee = "",
-  items: { name: string; amount: number }[] = []
+  items: Item[] = []
 ) {
-  const txn = db.transaction(() => {
-    const { lastInsertRowid } = db
-      .prepare(`INSERT INTO transactions (type, date, note, payee) VALUES (?, ?, ?, ?)`)
-      .run(type, date, note, payee);
-    const ins = db.prepare(
-      `INSERT INTO lines (transaction_id, account_id, category_id, amount) VALUES (?, ?, ?, ?)`
-    );
+  await sql.begin(async (tx) => {
+    const [{ id }] = await tx`
+      INSERT INTO transactions (user_id, type, date, note, payee)
+      VALUES (${uid}, ${type}, ${date}, ${note}, ${payee})
+      RETURNING id`;
     for (const l of lines) {
-      if (l.amount !== 0) ins.run(lastInsertRowid, l.account_id, l.category_id, l.amount);
+      if (l.amount !== 0)
+        await tx`
+          INSERT INTO lines (user_id, transaction_id, account_id, category_id, amount)
+          VALUES (${uid}, ${id}, ${l.account_id}, ${l.category_id}, ${l.amount})`;
     }
-    const insItem = db.prepare(
-      `INSERT INTO items (transaction_id, name, amount) VALUES (?, ?, ?)`
-    );
     for (const i of items) {
-      if (i.name.trim()) insItem.run(lastInsertRowid, i.name.trim(), i.amount);
+      if (i.name.trim())
+        await tx`
+          INSERT INTO items (user_id, transaction_id, name, amount)
+          VALUES (${uid}, ${id}, ${i.name.trim()}, ${i.amount})`;
     }
   });
-  txn();
 }
 
 function done(path = "/") {
@@ -39,6 +44,7 @@ function done(path = "/") {
 }
 
 export async function addExpense(formData: FormData) {
+  const uid = await getUserId();
   const amount = toCentavos(formData.get("amount") as string);
   const accountId = Number(formData.get("account_id"));
   const categoryId = Number(formData.get("category_id"));
@@ -47,7 +53,7 @@ export async function addExpense(formData: FormData) {
   const payee = ((formData.get("payee") as string) || "").trim();
   if (!Number.isFinite(amount) || amount <= 0 || !accountId || !categoryId) return;
 
-  const items: { name: string; amount: number }[] = [];
+  const items: Item[] = [];
   for (const [key, value] of formData.entries()) {
     const m = /^item_name_(\d+)$/.exec(key);
     if (!m) continue;
@@ -57,7 +63,8 @@ export async function addExpense(formData: FormData) {
     items.push({ name, amount: Number.isFinite(amt) && amt > 0 ? amt : 0 });
   }
 
-  insertTransaction(
+  await insertTransaction(
+    uid,
     "expense",
     date,
     note,
@@ -69,10 +76,11 @@ export async function addExpense(formData: FormData) {
 }
 
 export async function addIncome(formData: FormData) {
+  const uid = await getUserId();
   const accountId = Number(formData.get("account_id"));
   const date = (formData.get("date") as string) || todayISO();
   const note = ((formData.get("note") as string) || "").trim();
-  const splits: { account_id: number; category_id: number; amount: number }[] = [];
+  const splits: Line[] = [];
   for (const [key, value] of formData.entries()) {
     const m = /^split_(\d+)$/.exec(key);
     if (!m) continue;
@@ -82,24 +90,25 @@ export async function addIncome(formData: FormData) {
     }
   }
   if (!accountId || splits.length === 0) return;
-  insertTransaction("income", date, note, splits);
+  await insertTransaction(uid, "income", date, note, splits);
   done("/");
 }
 
-// One-tap payday: creates a single income transaction that drops each
-// envelope's per-cutoff target into its designated account.
 export async function logPayday(formData: FormData) {
+  const uid = await getUserId();
   const date = (formData.get("date") as string) || todayISO();
-  const rows = db
-    .prepare(
-      `SELECT id, payday_target, payday_account_id FROM categories
-       WHERE archived = 0 AND is_system = 0
-         AND payday_target > 0 AND payday_account_id IS NOT NULL`
-    )
-    .all() as { id: number; payday_target: number; payday_account_id: number }[];
+  const rows = (await sql`
+    SELECT id, payday_target, payday_account_id FROM categories
+    WHERE user_id = ${uid} AND archived = false AND is_system = false
+      AND payday_target > 0 AND payday_account_id IS NOT NULL`) as unknown as {
+    id: number;
+    payday_target: number;
+    payday_account_id: number;
+  }[];
   if (rows.length === 0) return;
 
-  insertTransaction(
+  await insertTransaction(
+    uid,
     "income",
     date,
     "Payday allocation",
@@ -113,6 +122,7 @@ export async function logPayday(formData: FormData) {
 }
 
 export async function addTransfer(formData: FormData) {
+  const uid = await getUserId();
   const amount = toCentavos(formData.get("amount") as string);
   const fromAccount = Number(formData.get("from_account_id"));
   const fromCategory = Number(formData.get("from_category_id"));
@@ -123,7 +133,7 @@ export async function addTransfer(formData: FormData) {
   if (!Number.isFinite(amount) || amount <= 0) return;
   if (fromAccount === toAccount && fromCategory === toCategory) return;
 
-  insertTransaction("transfer", date, note, [
+  await insertTransaction(uid, "transfer", date, note, [
     { account_id: fromAccount, category_id: fromCategory, amount: -amount },
     { account_id: toAccount, category_id: toCategory, amount: amount },
   ]);
@@ -131,11 +141,12 @@ export async function addTransfer(formData: FormData) {
 }
 
 export async function payCard(formData: FormData) {
+  const uid = await getUserId();
   const cardId = Number(formData.get("card_account_id"));
   const sourceId = Number(formData.get("source_account_id"));
   const date = (formData.get("date") as string) || todayISO();
   const note = ((formData.get("note") as string) || "").trim();
-  const lines: { account_id: number; category_id: number; amount: number }[] = [];
+  const lines: Line[] = [];
   for (const [key, value] of formData.entries()) {
     const m = /^pay_(\d+)$/.exec(key);
     if (!m) continue;
@@ -147,170 +158,205 @@ export async function payCard(formData: FormData) {
     }
   }
   if (!cardId || !sourceId || lines.length === 0) return;
-  insertTransaction("card_payment", date, note, lines);
+  await insertTransaction(uid, "card_payment", date, note, lines);
   done("/card");
 }
 
+async function ensureUnassigned(uid: string): Promise<number> {
+  const rows = await sql`
+    SELECT id FROM categories WHERE user_id = ${uid} AND is_system = true`;
+  if (rows.length > 0) return rows[0].id as number;
+  const [{ id }] = await sql`
+    INSERT INTO categories (user_id, name, is_system, sort)
+    VALUES (${uid}, 'Unassigned', true, 9999) RETURNING id`;
+  return id as number;
+}
+
 export async function createAccount(formData: FormData) {
+  const uid = await getUserId();
   const name = ((formData.get("name") as string) || "").trim();
   const type = formData.get("type") as string;
   const opening = toCentavos((formData.get("opening") as string) || "0");
   if (!name || !type) return;
 
-  const { lastInsertRowid } = db
-    .prepare(`INSERT INTO accounts (name, type) VALUES (?, ?)`)
-    .run(name, type);
+  const [{ id: accountId }] = await sql`
+    INSERT INTO accounts (user_id, name, type)
+    VALUES (${uid}, ${name}, ${type}) RETURNING id`;
 
   if (Number.isFinite(opening) && opening !== 0 && type !== "credit_card") {
-    const unassigned = db
-      .prepare(`SELECT id FROM categories WHERE is_system = 1`)
-      .get() as { id: number };
-    insertTransaction("opening", todayISO(), `Opening balance — ${name}`, [
-      { account_id: Number(lastInsertRowid), category_id: unassigned.id, amount: opening },
+    const unassigned = await ensureUnassigned(uid);
+    await insertTransaction(uid, "opening", todayISO(), `Opening balance — ${name}`, [
+      { account_id: accountId as number, category_id: unassigned, amount: opening },
     ]);
   }
   done("/settings");
 }
 
 export async function createCategory(formData: FormData) {
+  const uid = await getUserId();
   const name = ((formData.get("name") as string) || "").trim();
   if (!name) return;
-  db.prepare(`INSERT INTO categories (name) VALUES (?)`).run(name);
-  done("/settings");
-}
-
-export async function archiveAccount(formData: FormData) {
-  const id = Number(formData.get("id"));
-  const bal = (db
-    .prepare(`SELECT COALESCE(SUM(amount), 0) AS b FROM lines WHERE account_id = ?`)
-    .get(id) as { b: number }).b;
-  if (bal !== 0) {
-    done("/settings?error=account");
-    return;
-  }
-  db.prepare(`UPDATE accounts SET archived = 1 WHERE id = ?`).run(id);
-  done("/settings");
-}
-
-export async function archiveCategory(formData: FormData) {
-  const id = Number(formData.get("id"));
-  const bal = (db
-    .prepare(`SELECT COALESCE(SUM(amount), 0) AS b FROM lines WHERE category_id = ?`)
-    .get(id) as { b: number }).b;
-  if (bal !== 0) {
-    done("/settings?error=envelope");
-    return;
-  }
-  db.prepare(`UPDATE categories SET archived = 1 WHERE id = ? AND is_system = 0`).run(id);
-  done("/settings");
-}
-
-export async function unarchive(formData: FormData) {
-  const kind = formData.get("kind") as string;
-  const id = Number(formData.get("id"));
-  if (kind === "account") {
-    db.prepare(`UPDATE accounts SET archived = 0 WHERE id = ?`).run(id);
-  } else if (kind === "envelope") {
-    db.prepare(`UPDATE categories SET archived = 0 WHERE id = ?`).run(id);
-  }
+  await sql`INSERT INTO categories (user_id, name) VALUES (${uid}, ${name})`;
   done("/settings");
 }
 
 export async function reorderAccounts(ids: number[]) {
-  const stmt = db.prepare(`UPDATE accounts SET sort = ? WHERE id = ?`);
-  const tx = db.transaction(() => {
-    ids.forEach((id, i) => stmt.run(i, id));
+  const uid = await getUserId();
+  await sql.begin(async (tx) => {
+    for (let i = 0; i < ids.length; i++) {
+      await tx`UPDATE accounts SET sort = ${i} WHERE id = ${ids[i]} AND user_id = ${uid}`;
+    }
   });
-  tx();
   revalidatePath("/", "layout");
 }
 
 export async function createGroup(formData: FormData) {
+  const uid = await getUserId();
   const name = ((formData.get("name") as string) || "").trim();
   if (!name) return;
-  db.prepare(`INSERT INTO groups (name) VALUES (?)`).run(name);
+  await sql`INSERT INTO groups (user_id, name) VALUES (${uid}, ${name})`;
   done("/settings");
 }
 
 export async function archiveGroup(formData: FormData) {
+  const uid = await getUserId();
   const id = Number(formData.get("id"));
-  const tx = db.transaction(() => {
-    db.prepare(`UPDATE categories SET group_id = NULL WHERE group_id = ?`).run(id);
-    db.prepare(`UPDATE groups SET archived = 1 WHERE id = ?`).run(id);
+  await sql.begin(async (tx) => {
+    await tx`UPDATE categories SET group_id = NULL WHERE group_id = ${id} AND user_id = ${uid}`;
+    await tx`UPDATE groups SET archived = true WHERE id = ${id} AND user_id = ${uid}`;
   });
-  tx();
   done("/settings");
 }
 
 export async function setCategoryGroup(formData: FormData) {
+  const uid = await getUserId();
   const categoryId = Number(formData.get("category_id"));
   const groupId = Number(formData.get("group_id")) || null;
-  db.prepare(`UPDATE categories SET group_id = ? WHERE id = ? AND is_system = 0`).run(
-    groupId,
-    categoryId
-  );
+  await sql`
+    UPDATE categories SET group_id = ${groupId}
+    WHERE id = ${categoryId} AND user_id = ${uid} AND is_system = false`;
   done("/settings");
 }
 
 export async function createBill(formData: FormData) {
+  const uid = await getUserId();
   const name = ((formData.get("name") as string) || "").trim();
   const amount = toCentavos(formData.get("amount") as string);
   const accountId = Number(formData.get("account_id"));
   const categoryId = Number(formData.get("category_id"));
   if (!name || !Number.isFinite(amount) || amount <= 0 || !accountId || !categoryId) return;
-  db.prepare(
-    `INSERT INTO bills (name, expected_amount, account_id, category_id) VALUES (?, ?, ?, ?)`
-  ).run(name, amount, accountId, categoryId);
+  await sql`
+    INSERT INTO bills (user_id, name, expected_amount, account_id, category_id)
+    VALUES (${uid}, ${name}, ${amount}, ${accountId}, ${categoryId})`;
   done("/settings");
 }
 
 export async function archiveBill(formData: FormData) {
-  db.prepare(`UPDATE bills SET archived = 1 WHERE id = ?`).run(
-    Number(formData.get("id"))
-  );
+  const uid = await getUserId();
+  await sql`
+    UPDATE bills SET archived = true
+    WHERE id = ${Number(formData.get("id"))} AND user_id = ${uid}`;
   done("/settings");
 }
 
-// Tick = log the expense from the bill's envelope; untick = remove it.
 export async function toggleBillPaid(formData: FormData) {
+  const uid = await getUserId();
   const billId = Number(formData.get("bill_id"));
   const month = (formData.get("month") as string) || todayISO().slice(0, 7);
-  const bill = db
-    .prepare(`SELECT * FROM bills WHERE id = ?`)
-    .get(billId) as
-    | { id: number; name: string; expected_amount: number; account_id: number; category_id: number }
-    | undefined;
+  const bills = (await sql`
+    SELECT id, name, expected_amount, account_id, category_id
+    FROM bills WHERE id = ${billId} AND user_id = ${uid}`) as unknown as {
+    id: number;
+    name: string;
+    expected_amount: number;
+    account_id: number;
+    category_id: number;
+  }[];
+  const bill = bills[0];
   if (!bill) return;
 
-  const existing = db
-    .prepare(`SELECT id, transaction_id FROM bill_payments WHERE bill_id = ? AND month = ?`)
-    .get(billId, month) as { id: number; transaction_id: number } | undefined;
+  const existing = (await sql`
+    SELECT id, transaction_id FROM bill_payments
+    WHERE bill_id = ${billId} AND month = ${month} AND user_id = ${uid}`) as unknown as {
+    id: number;
+    transaction_id: number;
+  }[];
 
-  const tx = db.transaction(() => {
-    if (existing) {
-      db.prepare(`DELETE FROM transactions WHERE id = ?`).run(existing.transaction_id);
-      db.prepare(`DELETE FROM bill_payments WHERE id = ?`).run(existing.id);
-    } else {
-      const { lastInsertRowid } = db
-        .prepare(
-          `INSERT INTO transactions (type, date, note, payee) VALUES ('expense', ?, ?, ?)`
-        )
-        .run(todayISO(), bill.name, bill.name);
-      db.prepare(
-        `INSERT INTO lines (transaction_id, account_id, category_id, amount) VALUES (?, ?, ?, ?)`
-      ).run(lastInsertRowid, bill.account_id, bill.category_id, -bill.expected_amount);
-      db.prepare(
-        `INSERT INTO bill_payments (bill_id, month, transaction_id) VALUES (?, ?, ?)`
-      ).run(billId, month, lastInsertRowid);
-    }
-  });
-  tx();
+  if (existing[0]) {
+    await sql.begin(async (tx) => {
+      await tx`DELETE FROM transactions WHERE id = ${existing[0].transaction_id} AND user_id = ${uid}`;
+      await tx`DELETE FROM bill_payments WHERE id = ${existing[0].id} AND user_id = ${uid}`;
+    });
+  } else {
+    await sql.begin(async (tx) => {
+      const [{ id: txnId }] = await tx`
+        INSERT INTO transactions (user_id, type, date, note, payee)
+        VALUES (${uid}, 'expense', ${todayISO()}, ${bill.name}, ${bill.name})
+        RETURNING id`;
+      await tx`
+        INSERT INTO lines (user_id, transaction_id, account_id, category_id, amount)
+        VALUES (${uid}, ${txnId}, ${bill.account_id}, ${bill.category_id}, ${-bill.expected_amount})`;
+      await tx`
+        INSERT INTO bill_payments (user_id, bill_id, month, transaction_id)
+        VALUES (${uid}, ${billId}, ${month}, ${txnId})`;
+    });
+  }
   done("/");
 }
 
+export async function archiveAccount(formData: FormData) {
+  const uid = await getUserId();
+  const id = Number(formData.get("id"));
+  const [{ b }] = (await sql`
+    SELECT COALESCE(SUM(amount), 0)::int AS b FROM lines
+    WHERE account_id = ${id} AND user_id = ${uid}`) as unknown as { b: number }[];
+  if (b !== 0) {
+    done("/settings?error=account");
+    return;
+  }
+  await sql`UPDATE accounts SET archived = true WHERE id = ${id} AND user_id = ${uid}`;
+  done("/settings");
+}
+
+export async function archiveCategory(formData: FormData) {
+  const uid = await getUserId();
+  const id = Number(formData.get("id"));
+  const [{ b }] = (await sql`
+    SELECT COALESCE(SUM(amount), 0)::int AS b FROM lines
+    WHERE category_id = ${id} AND user_id = ${uid}`) as unknown as { b: number }[];
+  if (b !== 0) {
+    done("/settings?error=envelope");
+    return;
+  }
+  await sql`
+    UPDATE categories SET archived = true
+    WHERE id = ${id} AND user_id = ${uid} AND is_system = false`;
+  done("/settings");
+}
+
+export async function unarchive(formData: FormData) {
+  const uid = await getUserId();
+  const kind = formData.get("kind") as string;
+  const id = Number(formData.get("id"));
+  if (kind === "account") {
+    await sql`UPDATE accounts SET archived = false WHERE id = ${id} AND user_id = ${uid}`;
+  } else if (kind === "envelope") {
+    await sql`UPDATE categories SET archived = false WHERE id = ${id} AND user_id = ${uid}`;
+  }
+  done("/settings");
+}
+
 export async function deleteTransaction(formData: FormData) {
-  db.prepare(`DELETE FROM transactions WHERE id = ?`).run(
-    Number(formData.get("id"))
-  );
+  const uid = await getUserId();
+  await sql`
+    DELETE FROM transactions
+    WHERE id = ${Number(formData.get("id"))} AND user_id = ${uid}`;
   done("/activity");
+}
+
+export async function signOut() {
+  const { createClient } = await import("./supabase/server");
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+  redirect("/login");
 }

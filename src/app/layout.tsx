@@ -14,7 +14,8 @@ const fraunces = Fraunces({
 
 export const metadata: Metadata = {
   title: "Sobre",
-  description: "Envelope budgeting with credit-card sanity",
+  description:
+    "Every peso, spoken for — your money sorted into envelopes across all your banks, wallets, and cards.",
 };
 
 export const viewport: Viewport = {

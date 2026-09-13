@@ -15,9 +15,9 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default function Transfer() {
-  const accounts = getAccounts().filter((a) => a.type !== "credit_card");
-  const categories = getCategories();
+export default async function Transfer() {
+  const accounts = (await getAccounts()).filter((a) => a.type !== "credit_card");
+  const categories = await getCategories();
 
   const accountSelect = (name: string) => (
     <Select name={name} defaultValue={String(accounts[0]?.id)}>

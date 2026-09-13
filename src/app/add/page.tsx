@@ -17,12 +17,12 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default function AddExpense() {
-  const accounts = getAccounts();
-  const categories = getCategories().filter(
+export default async function AddExpense() {
+  const accounts = await getAccounts();
+  const categories = (await getCategories()).filter(
     (c) => !c.is_system || c.balance !== 0
   );
-  const payees = getPayeeSuggestions();
+  const payees = await getPayeeSuggestions();
 
   if (accounts.length === 0) {
     return (

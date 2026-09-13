@@ -18,7 +18,7 @@ export default async function CardPage({
   searchParams: Promise<{ card?: string }>;
 }) {
   const sp = await searchParams;
-  const accounts = getAccounts();
+  const accounts = await getAccounts();
   const cards = accounts.filter((a) => a.type === "credit_card");
   const sources = accounts.filter((a) => a.type !== "credit_card");
 
@@ -38,9 +38,12 @@ export default async function CardPage({
 
   const card =
     cards.find((c) => String(c.id) === sp?.card) ?? cards[0];
-  const debts = getCardDebts(card.id);
+  const debts = await getCardDebts(card.id);
   const cutoff = lastCutoffISO();
-  const { total, statement } = getStatementBalance(card.id, cutoff);
+  const { total, statement } = await getStatementBalance(card.id, cutoff);
+  const holdingsList = await Promise.all(
+    debts.map((d) => getCategoryHoldings(d.category_id))
+  );
 
   return (
     <main className="p-4 lg:p-8 space-y-4">
@@ -90,8 +93,8 @@ export default async function CardPage({
               Who owes the card, and where their money sits
             </h2>
             <div className="space-y-2">
-              {debts.map((d) => {
-                const holdings = getCategoryHoldings(d.category_id);
+              {debts.map((d, di) => {
+                const holdings = holdingsList[di];
                 return (
                   <div
                     key={d.category_id}

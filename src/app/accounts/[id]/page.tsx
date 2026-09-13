@@ -1,6 +1,6 @@
 import Link from "next/link";
-import db from "@/lib/db";
 import {
+  getAccountById,
   getAccountEnvelopes,
   getAccountTransactions,
 } from "@/lib/queries";
@@ -16,11 +16,7 @@ export default async function AccountDetail({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const account = db
-    .prepare(`SELECT * FROM accounts WHERE id = ?`)
-    .get(Number(id)) as
-    | { id: number; name: string; type: string }
-    | undefined;
+  const account = await getAccountById(Number(id));
 
   if (!account) {
     return (
@@ -33,9 +29,9 @@ export default async function AccountDetail({
     );
   }
 
-  const envelopes = getAccountEnvelopes(account.id);
+  const envelopes = await getAccountEnvelopes(account.id);
   const total = envelopes.reduce((s, e) => s + e.amount, 0);
-  const txns = getAccountTransactions(account.id, 50);
+  const txns = await getAccountTransactions(account.id, 50);
   const isCard = account.type === "credit_card";
 
   return (

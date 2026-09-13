@@ -1,25 +1,16 @@
 import Link from "next/link";
-import db from "@/lib/db";
-import { getTopPayees } from "@/lib/queries";
+import { getTopPayees, getTopPayeesAllTime } from "@/lib/queries";
 import { Card, CardContent } from "@/components/ui/card";
 import { peso, todayISO } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function PayeesPage() {
+export default async function PayeesPage() {
   const month = todayISO().slice(0, 7);
-  const thisMonth = getTopPayees(month, 20);
+  const thisMonth = await getTopPayees(month, 20);
   const monthLabel = new Date().toLocaleDateString("en-PH", { month: "long" });
 
-  const allTime = db
-    .prepare(
-      `SELECT t.payee, COUNT(*) AS times,
-        -SUM((SELECT SUM(l.amount) FROM lines l WHERE l.transaction_id = t.id)) AS spent
-       FROM transactions t
-       WHERE t.type = 'expense' AND t.payee != ''
-       GROUP BY t.payee ORDER BY spent DESC LIMIT 30`
-    )
-    .all() as { payee: string; times: number; spent: number }[];
+  const allTime = await getTopPayeesAllTime(30);
 
   const list = (rows: typeof allTime) => (
     <Card className="gap-0 divide-y divide-border/60 py-0 shadow-sm">

@@ -16,9 +16,9 @@ export default async function Activity({
 }) {
   const { from, to } = await searchParams;
   const filtered = !!(from || to);
-  const feed = getRecentTransactions(filtered ? 1000 : 200, from, to);
+  const feed = await getRecentTransactions(filtered ? 1000 : 200, from, to);
   const month = todayISO().slice(0, 7);
-  const topPayees = getTopPayees(month, 1);
+  const topPayees = await getTopPayees(month, 1);
   const spentInRange = feed
     .filter((t) => t.type === "expense")
     .reduce((s, t) => s + -t.amount, 0);

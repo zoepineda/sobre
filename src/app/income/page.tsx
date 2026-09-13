@@ -16,9 +16,9 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default function Income() {
-  const accounts = getAccounts().filter((a) => a.type !== "credit_card");
-  const categories = getCategories();
+export default async function Income() {
+  const accounts = (await getAccounts()).filter((a) => a.type !== "credit_card");
+  const categories = await getCategories();
 
   const template = categories.filter(
     (c) => c.payday_target > 0 && c.payday_account_id

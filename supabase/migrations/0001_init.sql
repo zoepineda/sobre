@@ -9,7 +9,7 @@
 
 -- ── accounts ────────────────────────────────────────────────────────────
 create table accounts (
-  id bigint generated always as identity primary key,
+  id integer generated always as identity primary key,
   user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
   name text not null,
   type text not null check (type in ('bank', 'ewallet', 'cash', 'credit_card')),
@@ -21,7 +21,7 @@ create table accounts (
 
 -- ── envelope groups ─────────────────────────────────────────────────────
 create table groups (
-  id bigint generated always as identity primary key,
+  id integer generated always as identity primary key,
   user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
   name text not null,
   archived boolean not null default false,
@@ -31,15 +31,15 @@ create table groups (
 
 -- ── categories (envelopes) ──────────────────────────────────────────────
 create table categories (
-  id bigint generated always as identity primary key,
+  id integer generated always as identity primary key,
   user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
   name text not null,
   archived boolean not null default false,
   sort integer not null default 0,
   is_system boolean not null default false,
-  group_id bigint,
-  payday_target bigint not null default 0,
-  payday_account_id bigint,
+  group_id integer,
+  payday_target integer not null default 0,
+  payday_account_id integer,
   unique (id, user_id),
   foreign key (group_id, user_id) references groups (id, user_id),
   foreign key (payday_account_id, user_id) references accounts (id, user_id)
@@ -47,7 +47,7 @@ create table categories (
 
 -- ── transactions ────────────────────────────────────────────────────────
 create table transactions (
-  id bigint generated always as identity primary key,
+  id integer generated always as identity primary key,
   user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
   type text not null check (type in ('expense', 'income', 'transfer', 'card_payment', 'opening')),
   date date not null,
@@ -59,12 +59,12 @@ create table transactions (
 
 -- ── ledger lines: signed deltas on (account, envelope) pairs ────────────
 create table lines (
-  id bigint generated always as identity primary key,
+  id integer generated always as identity primary key,
   user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
-  transaction_id bigint not null,
-  account_id bigint not null,
-  category_id bigint not null,
-  amount bigint not null,
+  transaction_id integer not null,
+  account_id integer not null,
+  category_id integer not null,
+  amount integer not null,
   foreign key (transaction_id, user_id) references transactions (id, user_id) on delete cascade,
   foreign key (account_id, user_id) references accounts (id, user_id),
   foreign key (category_id, user_id) references categories (id, user_id)
@@ -76,12 +76,12 @@ create index idx_lines_category on lines (user_id, category_id);
 
 -- ── recurring bills ─────────────────────────────────────────────────────
 create table bills (
-  id bigint generated always as identity primary key,
+  id integer generated always as identity primary key,
   user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
   name text not null,
-  expected_amount bigint not null,
-  account_id bigint not null,
-  category_id bigint not null,
+  expected_amount integer not null,
+  account_id integer not null,
+  category_id integer not null,
   archived boolean not null default false,
   sort integer not null default 0,
   unique (id, user_id),
@@ -90,11 +90,11 @@ create table bills (
 );
 
 create table bill_payments (
-  id bigint generated always as identity primary key,
+  id integer generated always as identity primary key,
   user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
-  bill_id bigint not null,
+  bill_id integer not null,
   month text not null,
-  transaction_id bigint not null,
+  transaction_id integer not null,
   unique (bill_id, month),
   foreign key (bill_id, user_id) references bills (id, user_id) on delete cascade,
   foreign key (transaction_id, user_id) references transactions (id, user_id) on delete cascade
@@ -102,11 +102,11 @@ create table bill_payments (
 
 -- ── receipt items ───────────────────────────────────────────────────────
 create table items (
-  id bigint generated always as identity primary key,
+  id integer generated always as identity primary key,
   user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
-  transaction_id bigint not null,
+  transaction_id integer not null,
   name text not null,
-  amount bigint not null default 0,
+  amount integer not null default 0,
   foreign key (transaction_id, user_id) references transactions (id, user_id) on delete cascade
 );
 

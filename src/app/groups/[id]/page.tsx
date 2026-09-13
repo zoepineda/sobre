@@ -1,6 +1,5 @@
 import Link from "next/link";
-import db from "@/lib/db";
-import { getCategories, getGroupOutflows } from "@/lib/queries";
+import { getCategories, getGroupById, getGroupOutflows } from "@/lib/queries";
 import { peso, prettyDate } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
@@ -11,9 +10,7 @@ export default async function GroupDetail({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const group = db
-    .prepare(`SELECT * FROM groups WHERE id = ?`)
-    .get(Number(id)) as { id: number; name: string } | undefined;
+  const group = await getGroupById(Number(id));
 
   if (!group) {
     return (
@@ -26,9 +23,9 @@ export default async function GroupDetail({
     );
   }
 
-  const envelopes = getCategories().filter((c) => c.group_id === group.id);
+  const envelopes = (await getCategories()).filter((c) => c.group_id === group.id);
   const total = envelopes.reduce((s, c) => s + c.balance, 0);
-  const outflows = getGroupOutflows(group.id, 100);
+  const outflows = await getGroupOutflows(group.id, 100);
 
   return (
     <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-2xl space-y-4">

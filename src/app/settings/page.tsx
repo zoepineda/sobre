@@ -1,5 +1,6 @@
 import { getAccounts, getBills, getCategories, getGroups } from "@/lib/queries";
 import {
+  signOut,
   archiveBill,
   archiveCategory,
   archiveGroup,
@@ -9,9 +10,11 @@ import {
   createGroup,
   unarchive,
 } from "@/lib/actions";
+import AddAccountForm from "@/components/AddAccountForm";
 import AddDialog from "@/components/AddDialog";
 import ArchiveDelete from "@/components/ArchiveDelete";
 import SetupAccountList from "@/components/SetupAccountList";
+import SetupTour from "@/components/SetupTour";
 import ShaderPicker from "@/components/ShaderPicker";
 import GroupAssign from "@/components/GroupAssign";
 import { Badge } from "@/components/ui/badge";
@@ -35,15 +38,15 @@ export default async function Settings({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
-  const accounts = getAccounts();
-  const categories = getCategories();
-  const groups = getGroups();
-  const bills = getBills(todayISO().slice(0, 7));
+  const accounts = await getAccounts();
+  const categories = await getCategories();
+  const groups = await getGroups();
+  const bills = await getBills(todayISO().slice(0, 7));
   const hiddenMoney = [
-    ...getAccounts(true)
+    ...(await getAccounts(true))
       .filter((a) => a.archived && a.balance !== 0)
       .map((a) => ({ kind: "account", id: a.id, name: a.name, balance: a.balance })),
-    ...getCategories(true)
+    ...(await getCategories(true))
       .filter((c) => c.archived && c.balance !== 0)
       .map((c) => ({ kind: "envelope", id: c.id, name: c.name, balance: c.balance })),
   ];
@@ -58,7 +61,10 @@ export default async function Settings({
 
   return (
     <main className="p-4 lg:p-8 space-y-5">
-      <h1 className="pt-3 lg:pt-0 text-xl font-bold">Setup</h1>
+      <div className="pt-3 lg:pt-0 flex items-center gap-2">
+        <h1 className="text-xl font-bold">Setup</h1>
+        <SetupTour />
+      </div>
 
       {error && (
         <p className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
@@ -107,43 +113,11 @@ export default async function Settings({
       )}
 
       <div className="space-y-5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0">
-      <section className="space-y-2">
+      <section data-tour="accounts" className="space-y-2">
         {sectionHeader(
           "Accounts",
           <AddDialog title="Add account" trigger="Account">
-            <form action={createAccount} className="space-y-3">
-              <Input
-                name="name"
-                placeholder="e.g. BPI, GCash, Wallet cash"
-                required
-              />
-              <div className="flex gap-2">
-                <Select name="type" defaultValue="bank">
-                  <SelectTrigger aria-label="Account type" className="flex-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="bank">Bank</SelectItem>
-                    <SelectItem value="ewallet">E-wallet</SelectItem>
-                    <SelectItem value="cash">Cash</SelectItem>
-                    <SelectItem value="credit_card">Credit card</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Input
-                  name="opening"
-                  inputMode="decimal"
-                  placeholder="Opening ₱ (not for cards)"
-                  className="flex-1"
-                />
-              </div>
-              <p className="text-[11px] text-muted-foreground">
-                Opening balances land in the Unassigned envelope — use Move to
-                distribute them. Credit cards start at zero owed.
-              </p>
-              <Button type="submit" className="w-full">
-                Add account
-              </Button>
-            </form>
+            <AddAccountForm />
           </AddDialog>
         )}
         {accounts.length > 0 && (
@@ -158,7 +132,7 @@ export default async function Settings({
         )}
       </section>
 
-      <section className="space-y-2">
+      <section data-tour="groups" className="space-y-2">
         {sectionHeader(
           "Envelope groups",
           <AddDialog title="Add envelope group" trigger="Group">
@@ -194,7 +168,7 @@ export default async function Settings({
         )}
       </section>
 
-      <section className="space-y-2">
+      <section data-tour="envelopes" className="space-y-2">
         {sectionHeader(
           "Envelopes",
           <AddDialog title="Add envelope" trigger="Envelope">
@@ -253,9 +227,18 @@ export default async function Settings({
         )}
       </section>
 
-      <section className="space-y-2">
+      <section data-tour="bills" className="space-y-2">
         {sectionHeader(
           "Recurring bills",
+          accounts.length === 0 ||
+          categories.filter((c) => !c.is_system).length === 0 ? (
+            <AddDialog title="Add recurring bill" trigger="Bill">
+              <p className="text-sm text-muted-foreground">
+                Bills need a home — add at least one account and one envelope
+                first, then come back here.
+              </p>
+            </AddDialog>
+          ) : (
           <AddDialog title="Add recurring bill" trigger="Bill">
             <form action={createBill} className="space-y-3">
               <div className="flex gap-2">
@@ -315,6 +298,7 @@ export default async function Settings({
               </Button>
             </form>
           </AddDialog>
+          )
         )}
         {bills.length > 0 ? (
           <Card className="gap-0 divide-y divide-border/60 py-0 shadow-sm">
@@ -348,7 +332,7 @@ export default async function Settings({
         )}
       </section>
 
-      <section className="space-y-2">
+      <section data-tour="appearance" className="space-y-2">
         <h2 className="text-sm font-semibold text-muted-foreground">
           Appearance
         </h2>
@@ -364,6 +348,12 @@ export default async function Settings({
         </Card>
       </section>
       </div>
+
+      <form action={signOut} className="pt-2">
+        <Button variant="ghost" size="sm" className="text-muted-foreground">
+          Sign out
+        </Button>
+      </form>
     </main>
   );
 }

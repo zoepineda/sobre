@@ -12,7 +12,7 @@ export default async function PayeePage({
 }) {
   const { name } = await params;
   const payee = decodeURIComponent(name);
-  const txns = getPayeeTransactions(payee);
+  const txns = await getPayeeTransactions(payee);
   const total = txns.reduce((s, t) => s + -t.amount, 0);
 
   return (

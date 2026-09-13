@@ -25,19 +25,19 @@ import { peso, prettyDate, todayISO } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
 
-export default function Dashboard() {
-  const accounts = getAccounts();
-  const categories = getCategories();
-  const groups = getGroups();
+export default async function Dashboard() {
+  const accounts = await getAccounts();
+  const categories = await getCategories();
+  const groups = await getGroups();
   const cards = accounts.filter((a) => a.type === "credit_card");
   const cash = accounts.filter((a) => a.type !== "credit_card");
   const month = todayISO().slice(0, 7);
-  const bills = getBills(month);
-  const spend = getMonthSpend(month);
+  const bills = await getBills(month);
+  const spend = await getMonthSpend(month);
   const totalSpend = spend.reduce((s, r) => s + r.spent, 0);
   const maxSpend = Math.max(1, ...spend.map((r) => r.spent));
-  const feed = getRecentTransactions(8);
-  const holdingsByCategory = getAllCategoryHoldings();
+  const feed = await getRecentTransactions(8);
+  const holdingsByCategory = await getAllCategoryHoldings();
   const totalCash = cash.reduce((s, a) => s + a.balance, 0);
   const totalOwed = cards.reduce((s, a) => s + Math.max(0, -a.balance), 0);
 
@@ -46,7 +46,7 @@ export default function Dashboard() {
       <main className="p-5 pt-14 space-y-4 text-center">
         <h1 className="flex justify-center text-2xl font-bold"><Logo size={34} /></h1>
         <p className="text-muted-foreground">
-          Envelope budgeting that knows what your credit card owes.
+          Every peso, spoken for.
         </p>
         <Button asChild size="lg">
           <Link href="/settings">Set up accounts &amp; envelopes →</Link>
