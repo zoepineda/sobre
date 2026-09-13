@@ -4,12 +4,12 @@ import { Accounts, Envelopes, Intro, Outro, Payday, Spend } from "./scenes";
 
 const FPS = 30;
 const SCENES = [
-  { Comp: Intro, frames: 150 }, // 5s
-  { Comp: Accounts, frames: 330 }, // 11s
-  { Comp: Envelopes, frames: 360 }, // 12s
-  { Comp: Payday, frames: 360 }, // 12s
-  { Comp: Spend, frames: 360 }, // 12s
-  { Comp: Outro, frames: 240 }, // 8s
+  { Comp: Intro, frames: 135 }, // 4.5s
+  { Comp: Accounts, frames: 240 }, // 8s
+  { Comp: Envelopes, frames: 330 }, // 11s
+  { Comp: Payday, frames: 270 }, // 9s
+  { Comp: Spend, frames: 240 }, // 8s
+  { Comp: Outro, frames: 150 }, // 5s
 ];
 const TOTAL = SCENES.reduce((s, x) => s + x.frames, 0);
 

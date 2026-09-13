@@ -31,7 +31,16 @@ export const Rise: React.FC<{
   );
 };
 
-/** The Sobre mark: amber tile, peeking eyes, wordmark. */
+/** The real Sobre V2 mark, straight from src/components/Logo.tsx:
+ * wobbly hand-drawn envelope, eyes peeking over the rim, amber tile. */
+const SW = 3.2;
+const Eye: React.FC<{ cx: number; open: number }> = ({ cx, open }) => (
+  <g transform={`translate(${cx} 19) scale(1 ${open}) translate(${-cx} -19)`}>
+    <circle cx={cx} cy={19} r={5.5} fill={PAPER} stroke={INK} strokeWidth={SW} />
+    <circle cx={cx - 1.2} cy={19.8} r={5.5 * 0.62} fill={INK} />
+  </g>
+);
+
 export const SobreLogo: React.FC<{ size?: number; delay?: number }> = ({
   size = 96,
   delay = 0,
@@ -40,66 +49,43 @@ export const SobreLogo: React.FC<{ size?: number; delay?: number }> = ({
   const { fps } = useVideoConfig();
   const pop = spring({ frame: frame - delay, fps, config: { damping: 12 } });
   const eyes = spring({ frame: frame - delay - 8, fps, config: { damping: 14 } });
-  const eye = (x: number) => (
-    <div
-      style={{
-        position: "absolute",
-        top: size * 0.3,
-        left: x,
-        width: size * 0.22,
-        height: size * 0.3,
-        borderRadius: "50%",
-        background: PAPER,
-        border: `${size * 0.045}px solid ${INK}`,
-        transform: `scaleY(${eyes})`,
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          bottom: size * 0.03,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: size * 0.09,
-          height: size * 0.09,
-          borderRadius: "50%",
-          background: INK,
-        }}
-      />
-    </div>
-  );
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: size * 0.28 }}>
-      <div
+    <div style={{ display: "flex", alignItems: "center", gap: size * 0.2 }}>
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 48 48"
+        fill="none"
         style={{
-          position: "relative",
-          width: size,
-          height: size,
-          borderRadius: size * 0.22,
-          background: AMBER,
           transform: `scale(${pop})`,
-          boxShadow: "0 10px 30px rgba(26,29,36,0.18)",
+          filter: "drop-shadow(0 10px 26px rgba(26,29,36,0.2))",
         }}
       >
-        {eye(size * 0.2)}
-        {eye(size * 0.56)}
-        <div
-          style={{
-            position: "absolute",
-            left: size * 0.12,
-            right: size * 0.12,
-            top: size * 0.62,
-            height: size * 0.04,
-            borderRadius: size,
-            background: INK,
-          }}
+        <rect width="48" height="48" rx="10" fill={AMBER} />
+        <path
+          d="M9.2 21.4 Q8.6 20.2 10 19.9 L23.2 19.4 L38.2 19.8 Q39.6 19.8 39.7 21.2 L40.2 37.4 Q40.3 39.5 38.4 39.6 L10.4 40.2 Q8.6 40.2 8.5 38.4 Z"
+          fill="none"
+          stroke={INK}
+          strokeWidth={SW}
+          strokeLinejoin="round"
         />
-      </div>
+        <path
+          d="M9.6 21.2 L24 31 L39.3 20.8"
+          stroke={INK}
+          strokeWidth={SW}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+        <Eye cx={17.75} open={eyes} />
+        <Eye cx={30.25} open={eyes} />
+      </svg>
       <div
         style={{
           fontFamily: HEADING,
-          fontWeight: 700,
-          fontSize: size * 0.75,
+          fontWeight: 900,
+          letterSpacing: "-0.02em",
+          fontSize: size * 0.72,
           color: INK,
           opacity: eyes,
         }}

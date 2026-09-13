@@ -83,7 +83,7 @@ export const Intro: React.FC<{ duration: number }> = ({ duration }) => {
             transform: `translateY(${interpolate(tag, [0, 1], [26, 0])}px)`,
           }}
         >
-          Every peso, spoken for.
+          Every peso accounted for.
         </div>
       </AbsoluteFill>
     </Stage>
@@ -100,7 +100,7 @@ export const Accounts: React.FC<{ duration: number }> = ({ duration }) => {
             <StepTitle
               step="Step 1"
               title="Add your accounts"
-              body="Banks, e-wallets, cash, and your credit card. Each one gets its own card, styled like the real thing."
+              body="Banks, e-wallets, cash, and your credit card. Each becomes a card in Sobre."
             />
           }
           right={
@@ -138,7 +138,7 @@ export const Accounts: React.FC<{ duration: number }> = ({ duration }) => {
   );
 };
 
-// ── 3. Envelopes ──
+// ── 3. The envelope concept ──
 export const Envelopes: React.FC<{ duration: number }> = ({ duration }) => {
   const rows = [
     ["Savings", "₱60,000.00"],
@@ -154,31 +154,50 @@ export const Envelopes: React.FC<{ duration: number }> = ({ duration }) => {
           left={
             <StepTitle
               step="Step 2"
-              title="Sort it into envelopes"
-              body="Every peso you have gets a job. Envelopes always add up to exactly your total cash, so nothing hides."
+              title="Meet envelopes"
+              body="Envelopes work like categories, but they hold real money. Every peso sits in exactly one envelope, so together they always equal your total cash."
             />
           }
           right={
-            <Panel>
-              <div
-                style={{
-                  padding: "22px 28px",
-                  fontFamily: BODY,
-                  fontWeight: 700,
-                  fontSize: 22,
-                  letterSpacing: 3,
-                  textTransform: "uppercase",
-                  color: MUTED,
-                }}
-              >
-                Envelopes
-              </div>
-              {rows.map(([name, amount], i) => (
-                <Rise key={name} delay={10 + i * 7}>
-                  <EnvelopeRow name={name} amount={amount} />
+            <div style={{ display: "flex", flexDirection: "column", gap: 26, alignItems: "stretch", width: 560 }}>
+              <Rise delay={6}>
+                <div
+                  style={{
+                    borderRadius: 22,
+                    background: PINE,
+                    color: "#fff",
+                    padding: "26px 30px",
+                    fontFamily: BODY,
+                    boxShadow: "0 16px 40px rgba(26,29,36,0.24)",
+                  }}
+                >
+                  <div style={{ fontSize: 20, opacity: 0.7, letterSpacing: 3, textTransform: "uppercase" }}>
+                    Total cash
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: 48, marginTop: 4 }}>₱112,190.36</div>
+                </div>
+              </Rise>
+              <Panel width={560}>
+                {rows.map(([name, amount], i) => (
+                  <Rise key={name} delay={18 + i * 8}>
+                    <EnvelopeRow name={name} amount={amount} />
+                  </Rise>
+                ))}
+                <Rise delay={64}>
+                  <div
+                    style={{
+                      padding: "18px 28px",
+                      fontFamily: BODY,
+                      fontSize: 22,
+                      color: MUTED,
+                      background: "rgba(47,111,79,0.07)",
+                    }}
+                  >
+                    5 envelopes = ₱112,190.36. Always, to the centavo.
+                  </div>
                 </Rise>
-              ))}
-            </Panel>
+              </Panel>
+            </div>
           }
         />
       </AbsoluteFill>
@@ -237,7 +256,7 @@ export const Payday: React.FC<{ duration: number }> = ({ duration }) => {
             <StepTitle
               step="Step 3"
               title="One tap on payday"
-              body="Log payday fills every envelope with its planned amount, in the right account, all at once."
+              body="Log payday fills every envelope with its planned amount, all at once."
             />
           }
           right={
@@ -284,7 +303,7 @@ export const Spend: React.FC<{ duration: number }> = ({ duration }) => {
             <StepTitle
               step="Step 4"
               title="Spend without surprises"
-              body="Expenses come out of their envelope. Swipe your credit card, and Sobre reserves that envelope's cash for payback, so the bill is never a shock."
+              body="Expenses come out of their envelope. Card swipes reserve that envelope's cash for payback, so the bill is never a shock."
             />
           }
           right={
@@ -348,7 +367,7 @@ export const Outro: React.FC<{ duration: number }> = () => {
             opacity: url,
           }}
         >
-          Every peso, spoken for.
+          Every peso accounted for.
         </div>
         <div
           style={{
