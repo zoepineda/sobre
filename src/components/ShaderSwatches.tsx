@@ -57,6 +57,7 @@ export default function ShaderSwatches() {
       <PopoverTrigger asChild>
         <button
           type="button"
+          data-hint="palette"
           aria-label="Change card background"
           className="absolute right-3 top-3 z-10 flex size-7 items-center justify-center rounded-md bg-black/25 text-white/70 backdrop-blur-sm transition-colors hover:text-white"
         >

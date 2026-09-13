@@ -18,6 +18,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import CashCard from "@/components/CashCard";
+import PaletteHint from "@/components/PaletteHint";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -154,6 +155,7 @@ export default async function Dashboard() {
       <div className="space-y-5 lg:col-span-2">
       <section className="space-y-2">
         <CashCard totalCash={totalCash} />
+        <PaletteHint userId={user?.id} />
         <Card className="py-0 shadow-sm">
           <Link
             href="/card"
