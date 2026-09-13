@@ -71,7 +71,7 @@ export default function Logo({
           className="font-heading font-black tracking-tight"
           style={{ fontSize: size * 0.72 }}
         >
-          sobre
+          Sobre
         </span>
       )}
     </span>

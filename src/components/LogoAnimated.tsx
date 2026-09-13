@@ -138,7 +138,7 @@ export default function LogoAnimated({
           className="font-heading font-black tracking-tight"
           style={{ fontSize: size * 0.72 }}
         >
-          {"sobre".split("").map((ch, i) => (
+          {"Sobre".split("").map((ch, i) => (
             <motion.span
               key={i}
               className="inline-block"

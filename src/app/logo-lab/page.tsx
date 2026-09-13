@@ -131,7 +131,7 @@ export default function LogoLab() {
         default: "v2",
       },
       heroBg: "#ffb80a",
-      wordmark: "sobre",
+      wordmark: "Sobre",
       v1: {
         _collapsed: true,
         tile: "#1e4633",
