@@ -6,7 +6,6 @@ import {
   archiveGroup,
   createAccount,
   createBill,
-  createCategory,
   createGroup,
   unarchive,
 } from "@/lib/actions";
