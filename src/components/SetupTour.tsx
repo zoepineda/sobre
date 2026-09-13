@@ -36,23 +36,26 @@ const STEPS: { target: string | null; title: string; body: string }[] = [
   },
 ];
 
-const DONE_KEY = "sobre-setup-tour-done";
 const PAD = 8;
 
-export default function SetupTour() {
+export default function SetupTour({ userId }: { userId?: string }) {
   const [step, setStep] = useState(-1);
   const [rect, setRect] = useState<DOMRect | null>(null);
   const reduced = useReducedMotion() ?? false;
 
+  // per-user done flag — a second account on the same browser still gets
+  // its own first-run tour
+  const doneKey = `sobre-setup-tour-done:${userId ?? "anon"}`;
+
   // auto-start on first visit
   useEffect(() => {
-    if (!localStorage.getItem(DONE_KEY)) setStep(0);
-  }, []);
+    if (!localStorage.getItem(doneKey)) setStep(0);
+  }, [doneKey]);
 
   const finish = useCallback(() => {
-    localStorage.setItem(DONE_KEY, "1");
+    localStorage.setItem(doneKey, "1");
     setStep(-1);
-  }, []);
+  }, [doneKey]);
 
   // measure + follow the current target
   useEffect(() => {

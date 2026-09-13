@@ -2,9 +2,7 @@ import { getAccounts, getBills, getCategories, getGroups } from "@/lib/queries";
 import {
   signOut,
   archiveBill,
-  archiveCategory,
   archiveGroup,
-  createAccount,
   createBill,
   createGroup,
   unarchive,
@@ -70,7 +68,7 @@ export default async function Settings({
     <main className="p-4 lg:p-8 space-y-5">
       <div className="pt-3 lg:pt-0 flex items-center gap-2">
         <h1 className="text-xl font-bold">Setup</h1>
-        <SetupTour />
+        <SetupTour userId={user?.id} />
       </div>
 
       {error === "account-in-use" ? (
