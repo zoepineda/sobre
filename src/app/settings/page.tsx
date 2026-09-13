@@ -189,7 +189,6 @@ export default async function Settings({
           envelopes={categories.map((c) => ({
             id: c.id,
             name: c.name,
-            icon: c.icon,
             is_system: c.is_system,
             group_id: c.group_id,
             payday_target: c.payday_target,

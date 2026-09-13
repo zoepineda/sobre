@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ENVELOPE_ICONS } from "@/components/EnvelopeList";
 import { createCategory } from "@/lib/actions";
 
 type Opt = { id: number; name: string };
@@ -24,11 +22,8 @@ export default function AddEnvelopeForm({
   groups: Opt[];
   accounts: Opt[];
 }) {
-  const [icon, setIcon] = useState("");
-
   return (
     <form action={createCategory} className="space-y-3">
-      <input type="hidden" name="icon" value={icon} />
       <div className="space-y-1">
         <Label htmlFor="new-env-name" className="text-xs text-muted-foreground">
           Name
@@ -39,39 +34,6 @@ export default function AddEnvelopeForm({
           placeholder="e.g. Travel Fund"
           required
         />
-      </div>
-      <div className="space-y-1">
-        <Label className="text-xs text-muted-foreground">Icon</Label>
-        <div className="grid grid-cols-8 gap-1">
-          <button
-            type="button"
-            aria-label="No icon"
-            onClick={() => setIcon("")}
-            className={`flex h-9 items-center justify-center rounded-md border text-xs ${
-              icon === ""
-                ? "border-primary bg-secondary text-secondary-foreground"
-                : "border-border text-muted-foreground hover:bg-muted"
-            }`}
-          >
-            —
-          </button>
-          {ENVELOPE_ICONS.map((name) => (
-            <button
-              key={name}
-              type="button"
-              aria-label={name.replace("lni-", "").replace(/-/g, " ")}
-              aria-pressed={icon === name}
-              onClick={() => setIcon(name)}
-              className={`flex h-9 items-center justify-center rounded-md border ${
-                icon === name
-                  ? "border-primary bg-secondary text-secondary-foreground"
-                  : "border-border text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              <i className={`lni ${name} text-sm`} aria-hidden />
-            </button>
-          ))}
-        </div>
       </div>
       <div className="flex gap-2">
         <div className="flex-1 space-y-1">
