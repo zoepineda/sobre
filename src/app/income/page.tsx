@@ -6,13 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 export const dynamic = "force-dynamic";
 
@@ -76,27 +69,16 @@ export default async function Income() {
       </p>
       <form action={addIncome} className="space-y-4">
         <IncomeSplits
-          categories={categories.map((c) => ({ id: c.id, name: c.name }))}
+          categories={categories.map((c) => ({
+            id: c.id,
+            name: c.name,
+            homeId: c.payday_account_id,
+            isSystem: c.is_system,
+          }))}
+          accounts={accounts.map((a) => ({ id: a.id, name: a.name }))}
         />
         <Card className="py-4 shadow-sm">
           <CardContent className="space-y-3 px-4">
-            <div className="space-y-1">
-              <Label htmlFor="income-account" className="text-xs text-muted-foreground">
-                Deposited into
-              </Label>
-              <Select name="account_id" defaultValue={String(accounts[0]?.id)}>
-                <SelectTrigger id="income-account" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {accounts.map((a) => (
-                    <SelectItem key={a.id} value={String(a.id)}>
-                      {a.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
             <div className="flex gap-3">
               <div className="flex-1 space-y-1">
                 <Label htmlFor="date" className="text-xs text-muted-foreground">
