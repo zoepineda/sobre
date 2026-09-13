@@ -124,3 +124,57 @@ export function useShaderChoice(): string {
   }, []);
   return choice;
 }
+
+// ── custom cash-card hue ──
+// null = the default Pine palette. A picked hue rebuilds the same
+// palette structure (mid / dark / light / darkest / lighter) so shaders
+// and text contrast behave exactly like the pine original.
+const HUE_KEY = "cash-hue";
+const HUE_EVENT = "cash-hue-change";
+
+function hslToHex(h: number, s: number, l: number): string {
+  const a = (s / 100) * Math.min(l / 100, 1 - l / 100);
+  const f = (n: number) => {
+    const k = (n + h / 30) % 12;
+    const c = l / 100 - a * Math.max(-1, Math.min(k - 3, Math.min(9 - k, 1)));
+    return Math.round(255 * c)
+      .toString(16)
+      .padStart(2, "0");
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+export function paletteFromHue(h: number): string[] {
+  return [
+    hslToHex(h, 40, 31), // mid (≈ #2f6f4f)
+    hslToHex(h, 40, 20), // dark card base (≈ #1e4633)
+    hslToHex(h, 34, 48), // light (≈ #4fa878)
+    hslToHex(h, 47, 10), // darkest (≈ #0d241a)
+    hslToHex(h, 32, 55), // lighter (≈ #67b08c)
+  ];
+}
+
+export function setCashHue(h: number | null) {
+  if (h === null) localStorage.removeItem(HUE_KEY);
+  else localStorage.setItem(HUE_KEY, String(Math.round(h)));
+  window.dispatchEvent(new CustomEvent(HUE_EVENT, { detail: h }));
+}
+
+export function useCashHue(): number | null {
+  const [hue, setHue] = useState<number | null>(null);
+  useEffect(() => {
+    const stored = localStorage.getItem(HUE_KEY);
+    setHue(stored === null ? null : Number(stored));
+    const onChange = (e: Event) =>
+      setHue((e as CustomEvent<number | null>).detail);
+    window.addEventListener(HUE_EVENT, onChange);
+    return () => window.removeEventListener(HUE_EVENT, onChange);
+  }, []);
+  return hue;
+}
+
+/** Active cash-card palette: custom hue when set, Pine otherwise. */
+export function useCashPalette(): string[] {
+  const hue = useCashHue();
+  return hue === null ? PINE : paletteFromHue(hue);
+}

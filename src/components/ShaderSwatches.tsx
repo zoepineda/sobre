@@ -6,12 +6,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import HueWheel from "@/components/HueWheel";
 import {
-  PINE,
   PLAIN,
   SHADER_DEFS,
   recolor,
+  setCashHue,
   setShaderChoice,
+  useCashHue,
+  useCashPalette,
   useShaderChoice,
 } from "@/lib/paperShaders";
 
@@ -21,6 +24,8 @@ const FILL = { position: "absolute" as const, inset: 0, width: "100%", height: "
 // Shares the global shader store, so Setup's picker stays in sync.
 export default function ShaderSwatches() {
   const choice = useShaderChoice();
+  const hue = useCashHue();
+  const palette = useCashPalette();
   const [open, setOpen] = useState(false);
 
   const swatch = (
@@ -34,11 +39,12 @@ export default function ShaderSwatches() {
       className="group flex flex-col items-center gap-1"
     >
       <span
-        className={`relative block h-10 w-16 overflow-hidden rounded-md bg-pine ${
+        className={`relative block h-10 w-16 overflow-hidden rounded-md ${
           choice === name
             ? "ring-2 ring-primary ring-offset-2"
             : "opacity-80 group-hover:opacity-100"
         }`}
+        style={{ background: palette[1] }}
       >
         {body}
       </span>
@@ -71,10 +77,38 @@ export default function ShaderSwatches() {
             SHADER_DEFS.map((d) =>
               swatch(
                 d.name,
-                <d.Comp style={FILL} {...recolor(d.params, PINE)} />
+                <d.Comp style={FILL} {...recolor(d.params, palette)} />
               )
             )}
           {open && swatch(PLAIN, null)}
+        </div>
+        <div className="mt-3 border-t pt-3">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-[11px] font-medium text-muted-foreground">
+              Card color
+            </p>
+            {hue !== null && (
+              <button
+                type="button"
+                onClick={() => setCashHue(null)}
+                className="text-[10px] font-medium text-primary"
+              >
+                Reset to Pine
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-4">
+            <HueWheel hue={hue} onChange={setCashHue} />
+            <div className="space-y-1.5">
+              <span
+                className="block h-10 w-16 rounded-md shadow-sm"
+                style={{ background: palette[1] }}
+              />
+              <p className="text-center text-[10px] text-muted-foreground">
+                {hue === null ? "Pine" : `Hue ${hue}°`}
+              </p>
+            </div>
+          </div>
         </div>
       </PopoverContent>
     </Popover>
