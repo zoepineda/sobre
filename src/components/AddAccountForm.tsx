@@ -11,6 +11,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createAccount } from "@/lib/actions";
+import { cardStyle } from "@/lib/cardStyles";
+
+// mini brand card for the suggestion list — gradient from cardStyles plus a
+// monogram (capitals in the name, e.g. GCash → GC), since we don't ship logos
+function brandMark(name: string) {
+  if (name.length <= 4) return name.toUpperCase();
+  const caps = name.replace(/[^A-Z]/g, "");
+  return (caps.length >= 2 ? caps : name.slice(0, 2).toUpperCase()).slice(0, 3);
+}
 
 // Known PH banks/wallets — suggested only while typing (never a full dump),
 // and picking one auto-fills the account type.
@@ -107,7 +116,7 @@ export default function AddAccountForm() {
               <li key={k.name} role="option" aria-selected={i === focusIdx}>
                 <button
                   type="button"
-                  className={`flex w-full items-center justify-between px-3 py-2.5 text-left text-sm ${
+                  className={`flex w-full items-center justify-between px-3 py-2 text-left text-sm ${
                     i === focusIdx ? "bg-accent" : "hover:bg-accent"
                   }`}
                   onMouseDown={(e) => {
@@ -115,7 +124,19 @@ export default function AddAccountForm() {
                     pick(k);
                   }}
                 >
-                  {k.name}
+                  <span className="flex items-center gap-2.5">
+                    <span
+                      aria-hidden
+                      className="flex h-6 w-9 shrink-0 items-center justify-center rounded-[5px] text-[9px] font-bold tracking-wide shadow-sm"
+                      style={{
+                        background: cardStyle(k.name, k.type).bg,
+                        color: cardStyle(k.name, k.type).fg,
+                      }}
+                    >
+                      {brandMark(k.name)}
+                    </span>
+                    {k.name}
+                  </span>
                   <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
                     {k.type.replace("_", " ")}
                   </span>
