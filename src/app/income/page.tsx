@@ -17,8 +17,11 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function Income() {
-  const accounts = (await getAccounts()).filter((a) => a.type !== "credit_card");
-  const categories = await getCategories();
+  const [allAccounts, categories] = await Promise.all([
+    getAccounts(),
+    getCategories(),
+  ]);
+  const accounts = allAccounts.filter((a) => a.type !== "credit_card");
 
   const template = categories.filter(
     (c) => c.payday_target > 0 && c.payday_account_id

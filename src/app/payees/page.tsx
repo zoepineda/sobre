@@ -7,10 +7,14 @@ export const dynamic = "force-dynamic";
 
 export default async function PayeesPage() {
   const month = todayISO().slice(0, 7);
-  const thisMonth = await getTopPayees(month, 20);
+  const thisMonthPromise = getTopPayees(month, 20);
+  const allTimePromise = getTopPayeesAllTime(30);
   const monthLabel = new Date().toLocaleDateString("en-PH", { month: "long" });
 
-  const allTime = await getTopPayeesAllTime(30);
+  const [thisMonth, allTime] = await Promise.all([
+    thisMonthPromise,
+    allTimePromise,
+  ]);
 
   const list = (rows: typeof allTime) => (
     <Card className="gap-0 divide-y divide-border/60 py-0 shadow-sm">

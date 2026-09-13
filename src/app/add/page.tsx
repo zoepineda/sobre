@@ -18,11 +18,14 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function AddExpense() {
-  const accounts = await getAccounts();
-  const categories = (await getCategories()).filter(
+  const [accounts, allCategories, payees] = await Promise.all([
+    getAccounts(),
+    getCategories(),
+    getPayeeSuggestions(),
+  ]);
+  const categories = allCategories.filter(
     (c) => !c.is_system || c.balance !== 0
   );
-  const payees = await getPayeeSuggestions();
 
   if (accounts.length === 0) {
     return (

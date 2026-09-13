@@ -23,9 +23,8 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims ?? null;
 
   const isLogin =
     request.nextUrl.pathname.startsWith("/login") ||

@@ -38,9 +38,11 @@ export default async function CardPage({
 
   const card =
     cards.find((c) => String(c.id) === sp?.card) ?? cards[0];
-  const debts = await getCardDebts(card.id);
   const cutoff = lastCutoffISO();
-  const { total, statement } = await getStatementBalance(card.id, cutoff);
+  const [debts, { total, statement }] = await Promise.all([
+    getCardDebts(card.id),
+    getStatementBalance(card.id, cutoff),
+  ]);
   const holdingsList = await Promise.all(
     debts.map((d) => getCategoryHoldings(d.category_id))
   );

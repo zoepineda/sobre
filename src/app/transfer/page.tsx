@@ -16,8 +16,11 @@ import {
 export const dynamic = "force-dynamic";
 
 export default async function Transfer() {
-  const accounts = (await getAccounts()).filter((a) => a.type !== "credit_card");
-  const categories = await getCategories();
+  const [allAccounts, categories] = await Promise.all([
+    getAccounts(),
+    getCategories(),
+  ]);
+  const accounts = allAccounts.filter((a) => a.type !== "credit_card");
 
   const accountSelect = (name: string) => (
     <Select name={name} defaultValue={String(accounts[0]?.id)}>

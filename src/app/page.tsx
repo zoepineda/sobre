@@ -27,19 +27,22 @@ import { getSessionUser } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export default async function Dashboard() {
-  const user = await getSessionUser();
-  const accounts = await getAccounts();
-  const categories = await getCategories();
-  const groups = await getGroups();
+  const month = todayISO().slice(0, 7);
+  const [user, accounts, categories, groups, bills, spend, feed, holdingsByCategory] =
+    await Promise.all([
+      getSessionUser(),
+      getAccounts(),
+      getCategories(),
+      getGroups(),
+      getBills(month),
+      getMonthSpend(month),
+      getRecentTransactions(8),
+      getAllCategoryHoldings(),
+    ]);
   const cards = accounts.filter((a) => a.type === "credit_card");
   const cash = accounts.filter((a) => a.type !== "credit_card");
-  const month = todayISO().slice(0, 7);
-  const bills = await getBills(month);
-  const spend = await getMonthSpend(month);
   const totalSpend = spend.reduce((s, r) => s + r.spent, 0);
   const maxSpend = Math.max(1, ...spend.map((r) => r.spent));
-  const feed = await getRecentTransactions(8);
-  const holdingsByCategory = await getAllCategoryHoldings();
   const totalCash = cash.reduce((s, a) => s + a.balance, 0);
   const totalOwed = cards.reduce((s, a) => s + Math.max(0, -a.balance), 0);
 

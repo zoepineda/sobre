@@ -39,16 +39,21 @@ export default async function Settings({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
-  const user = await getSessionUser();
-  const accounts = await getAccounts();
-  const categories = await getCategories();
-  const groups = await getGroups();
-  const bills = await getBills(todayISO().slice(0, 7));
+  const [user, accounts, categories, groups, bills, allAccounts, allCategories] =
+    await Promise.all([
+      getSessionUser(),
+      getAccounts(),
+      getCategories(),
+      getGroups(),
+      getBills(todayISO().slice(0, 7)),
+      getAccounts(true),
+      getCategories(true),
+    ]);
   const hiddenMoney = [
-    ...(await getAccounts(true))
+    ...allAccounts
       .filter((a) => a.archived && a.balance !== 0)
       .map((a) => ({ kind: "account", id: a.id, name: a.name, balance: a.balance })),
-    ...(await getCategories(true))
+    ...allCategories
       .filter((c) => c.archived && c.balance !== 0)
       .map((c) => ({ kind: "envelope", id: c.id, name: c.name, balance: c.balance })),
   ];

@@ -33,19 +33,23 @@ export type SessionUser = {
   avatarUrl: string | null;
 };
 
+// Verifies the JWT locally (asymmetric keys) — no auth-server round trip.
+const getClaims = cache(async () => {
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  return data?.claims ?? null;
+});
+
 // Nullable variant for chrome (nav, greetings) — never redirects.
 export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const claims = await getClaims();
+  if (!claims) return null;
+  const meta = (claims.user_metadata ?? {}) as Record<string, unknown>;
   const name =
     (meta.full_name as string) || (meta.name as string) || null;
   return {
-    id: user.id,
-    email: user.email ?? null,
+    id: claims.sub,
+    email: (claims.email as string) ?? null,
     name,
     firstName: name ? name.split(" ")[0] : null,
     avatarUrl: (meta.avatar_url as string) || (meta.picture as string) || null,
@@ -54,10 +58,7 @@ export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
 
 // Per-request cached user id; redirects to /login when signed out.
 export const getUserId = cache(async (): Promise<string> => {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-  return user.id;
+  const claims = await getClaims();
+  if (!claims) redirect("/login");
+  return claims.sub;
 });
