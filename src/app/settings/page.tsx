@@ -48,14 +48,15 @@ export default async function Settings({
       getAccounts(true),
       getCategories(true),
     ]);
-  const hiddenMoney = [
+  const archived = [
     ...allAccounts
-      .filter((a) => a.archived && a.balance !== 0)
+      .filter((a) => a.archived)
       .map((a) => ({ kind: "account", id: a.id, name: a.name, balance: a.balance })),
     ...allCategories
-      .filter((c) => c.archived && c.balance !== 0)
+      .filter((c) => c.archived)
       .map((c) => ({ kind: "envelope", id: c.id, name: c.name, balance: c.balance })),
   ];
+  const holdsMoney = archived.some((h) => h.balance !== 0);
 
   // pr-3 lines the + button's center up with the trash icons in the rows below
   const sectionHeader = (label: string, dialog: React.ReactNode) => (
@@ -86,42 +87,47 @@ export default async function Settings({
         </p>
       ) : null}
 
-      {hiddenMoney.length > 0 && (
-        <Card className="border-destructive/40 py-4 shadow-sm">
-          <CardContent className="space-y-2 px-4">
-            <p className="text-sm font-semibold text-destructive">
-              Archived but still holding money
-            </p>
-            <p className="text-[11px] text-muted-foreground">
-              These were archived while they still had a balance, so that money
-              is hidden from your totals. Unarchive them, then move the money
-              out before archiving again.
-            </p>
-            {hiddenMoney.map((h) => (
+      {archived.length > 0 && (
+        <details className="group">
+          <summary className="cursor-pointer list-none text-xs font-semibold text-muted-foreground">
+            <span className="mr-1 inline-block transition-transform group-open:rotate-90">
+              ›
+            </span>
+            Archived ({archived.length})
+            {holdsMoney && (
+              <span className="ml-2 font-normal text-destructive">
+                some still hold money
+              </span>
+            )}
+          </summary>
+          <Card className="mt-2 gap-0 divide-y divide-border/60 py-0 shadow-sm">
+            {archived.map((h) => (
               <div
                 key={`${h.kind}-${h.id}`}
-                className="flex items-center justify-between"
+                className="flex items-center justify-between px-4 py-2"
               >
                 <p className="text-sm">
                   {h.name}
-                  <Badge variant="outline" className="ml-1.5 text-[11px]">
+                  <Badge variant="outline" className="ml-1.5 text-[10px]">
                     {h.kind}
                   </Badge>
-                  <span className="ml-2 text-xs font-semibold">
-                    {peso(h.balance)}
-                  </span>
+                  {h.balance !== 0 && (
+                    <span className="ml-2 text-xs font-semibold text-destructive">
+                      holds {peso(h.balance)}
+                    </span>
+                  )}
                 </p>
                 <form action={unarchive}>
                   <input type="hidden" name="kind" value={h.kind} />
                   <input type="hidden" name="id" value={h.id} />
-                  <Button variant="link" size="sm" className="h-7 text-xs">
-                    unarchive
+                  <Button variant="secondary" size="xs">
+                    Unarchive
                   </Button>
                 </form>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </Card>
+        </details>
       )}
 
       <div className="space-y-5 lg:grid lg:grid-cols-2 lg:items-start lg:gap-6 lg:space-y-0">
