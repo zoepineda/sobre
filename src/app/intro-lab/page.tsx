@@ -43,12 +43,12 @@ export default function IntroLab() {
   const dial = useDialKitController(
     "Login Intro",
     {
-      startScale: [1.6, 1, 2.6, 0.05],
-      logoDone: [1.9, 0.5, 4, 0.05],
-      holdBeat: [0.35, 0, 1.5, 0.05],
-      dockSpring: { type: "spring", visualDuration: 0.65, bounce: 0.22 },
-      cardDelay: [0.18, 0, 1, 0.02],
-      cardSpring: { type: "spring", visualDuration: 0.5, bounce: 0.18 },
+      startScale: [2.1, 1, 2.6, 0.05],
+      logoDone: [2.05, 0.5, 4, 0.05],
+      holdBeat: [0.3, 0, 1.5, 0.05],
+      dockSpring: { type: "spring", stiffness: 131, damping: 17, mass: 1.1 },
+      cardDelay: [0.34, 0, 1, 0.02],
+      cardSpring: { type: "spring", stiffness: 200, damping: 25, mass: 1 },
       replay: { type: "action", label: "Replay intro" },
     },
     {

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion, useReducedMotion } from "motion/react";
 import LogoAnimated from "@/components/LogoAnimated";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,8 +10,59 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createClient } from "@/lib/supabase/client";
 
+/* ─────────────────────────────────────────────────────────
+ * LOGIN INTRO — ANIMATION STORYBOARD (tuned in /intro-lab)
+ *
+ *     0ms   logo storyboard plays at 2.1×, centered on screen
+ *           (tile pop → eyes blink in → glance → letters)
+ *  2050ms   storyboard done — hold a beat
+ *  2350ms   logo springs into the card header (131/17/1.1)
+ *  2690ms   login card rises in underneath (200/25/1)
+ *
+ * Reduced motion: skip straight to the settled layout.
+ * ───────────────────────────────────────────────────────── */
+
+const START_SCALE = 2.1;
+const LOGO_DONE = 2.05; // s — let the logo's own storyboard finish
+const HOLD_BEAT = 0.3; // s — beat of stillness before the dock
+const CARD_DELAY = 0.34; // s — card trails the docking logo
+const DOCK_SPRING = { type: "spring", stiffness: 131, damping: 17, mass: 1.1 } as const;
+const CARD_SPRING = { type: "spring", stiffness: 200, damping: 25, mass: 1 } as const;
+const SLOT = 40; // docked logo size
+const HERO = 64; // centered logo size
+
 export default function Login() {
   const router = useRouter();
+  const reduced = useReducedMotion() ?? false;
+
+  // stage machine: center → dock (card enters alongside)
+  const [stage, setStage] = useState<"center" | "dock">("center");
+  const [delta, setDelta] = useState<{ x: number; y: number } | null>(null);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const slotRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (reduced) {
+      setStage("dock");
+      return;
+    }
+    const t = setTimeout(() => {
+      const hero = heroRef.current?.getBoundingClientRect();
+      const slot = slotRef.current?.getBoundingClientRect();
+      if (hero && slot) {
+        setDelta({
+          x: slot.left + slot.width / 2 - (hero.left + hero.width / 2),
+          y: slot.top + slot.height / 2 - (hero.top + hero.height / 2),
+        });
+      }
+      setStage("dock");
+    }, (LOGO_DONE + HOLD_BEAT) * 1000);
+    return () => clearTimeout(t);
+  }, [reduced]);
+
+  const docked = stage === "dock";
+
+  // ── auth ──
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +82,6 @@ export default function Login() {
       setBusy(false);
       setError(error.message);
     }
-    // success: browser navigates to Google
   }
 
   async function submit(e: React.FormEvent) {
@@ -46,7 +97,6 @@ export default function Login() {
     setBusy(false);
     if (error) return setError(error.message);
     if (!data.session) {
-      // email confirmation is on: no session until the link is clicked
       setMode("signin");
       setNotice(
         "Almost there — check your email for the confirmation link, then come back and sign in."
@@ -59,12 +109,38 @@ export default function Login() {
 
   return (
     <main className="flex min-h-dvh items-center justify-center p-6">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="flex justify-center">
-          <LogoAnimated size={40} className="text-2xl" />
-        </div>
+      {/* the travelling brand: starts huge & centered, docks into the card */}
+      <div className="pointer-events-none fixed inset-0 z-20 flex items-center justify-center">
+        <motion.div
+          ref={heroRef}
+          initial={false}
+          animate={
+            docked && delta
+              ? { x: delta.x, y: delta.y, scale: SLOT / HERO }
+              : { x: 0, y: 0, scale: reduced ? SLOT / HERO : START_SCALE }
+          }
+          transition={reduced ? { duration: 0 } : DOCK_SPRING}
+        >
+          <LogoAnimated size={HERO} className="text-3xl" />
+        </motion.div>
+      </div>
+
+      <motion.div
+        className="w-full max-w-sm"
+        initial={reduced ? false : { opacity: 0, y: 28 }}
+        animate={docked ? { opacity: 1, y: 0 } : { opacity: 0, y: 28 }}
+        transition={
+          reduced ? { duration: 0 } : { ...CARD_SPRING, delay: CARD_DELAY }
+        }
+      >
         <Card className="py-5 shadow-sm">
           <CardContent className="px-5">
+            {/* landing slot for the brand — reserves the header space */}
+            <div
+              ref={slotRef}
+              className="mx-auto mb-5 flex h-10 w-40 items-center justify-center"
+              aria-hidden
+            />
             <Button
               type="button"
               variant="outline"
@@ -146,10 +222,10 @@ export default function Login() {
             </button>
           </CardContent>
         </Card>
-        <p className="text-center text-[11px] text-muted-foreground">
+        <p className="mt-6 text-center text-[11px] text-muted-foreground">
           Every peso, spoken for.
         </p>
-      </div>
+      </motion.div>
     </main>
   );
 }
