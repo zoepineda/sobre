@@ -159,16 +159,29 @@ export default function SetupTour({ userId }: { userId?: string }) {
               onClick={() => (last ? finish() : setStep(step + 1))}
             />
 
-            {/* tooltip card */}
+            {/* tooltip card — targetless steps center via a flex wrapper,
+                since Motion animates transform and would overwrite a CSS
+                translate(-50%,-50%) mid-animation */}
+            <div
+              className={
+                rect
+                  ? "contents"
+                  : "pointer-events-none fixed inset-0 z-10 flex items-center justify-center p-4"
+              }
+            >
             <motion.div
               key={step}
               initial={reduced ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="fixed z-10 mx-4 max-w-sm rounded-xl bg-card p-4 shadow-xl"
+              className={
+                rect
+                  ? "fixed z-10 mx-4 max-w-sm rounded-xl bg-card p-4 shadow-xl"
+                  : "pointer-events-auto w-full max-w-sm rounded-xl bg-card p-4 shadow-xl"
+              }
               style={
                 rect
                   ? { top: tooltipTop, left: Math.min(Math.max(16, rect.left), Math.max(16, window.innerWidth - 400)) }
-                  : { top: "50%", left: "50%", transform: "translate(-50%, -50%)", margin: 0 }
+                  : undefined
               }
               onClick={(e) => e.stopPropagation()}
             >
@@ -197,6 +210,7 @@ export default function SetupTour({ userId }: { userId?: string }) {
                 </div>
               </div>
             </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
