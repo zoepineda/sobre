@@ -34,7 +34,7 @@ export default function AddDialog({
         </Button>
       </DialogTrigger>
       <DialogContent
-        className="max-w-md"
+        className="max-w-[calc(100%-2rem)] sm:max-w-md"
         onSubmitCapture={() => setTimeout(() => setOpen(false), 80)}
       >
         <DialogHeader>

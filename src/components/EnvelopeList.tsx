@@ -152,7 +152,7 @@ export default function EnvelopeList({
 
       <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
         <DialogContent
-          className="max-w-md"
+          className="max-w-[calc(100%-2rem)] sm:max-w-md"
           onSubmitCapture={() => setTimeout(() => setEditing(null), 80)}
         >
           <DialogHeader>
