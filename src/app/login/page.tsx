@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "motion/react";
+import Logo from "@/components/Logo";
 import LogoAnimated from "@/components/LogoAnimated";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -37,6 +38,7 @@ export default function Login() {
 
   // stage machine: center → dock (card enters alongside)
   const [stage, setStage] = useState<"center" | "dock">("center");
+  const [settled, setSettled] = useState(false);
   const [delta, setDelta] = useState<{ x: number; y: number } | null>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const slotRef = useRef<HTMLDivElement>(null);
@@ -44,6 +46,7 @@ export default function Login() {
   useEffect(() => {
     if (reduced) {
       setStage("dock");
+      setSettled(true);
       return;
     }
     const t = setTimeout(() => {
@@ -52,7 +55,8 @@ export default function Login() {
       if (hero && slot) {
         setDelta({
           x: slot.left + slot.width / 2 - (hero.left + hero.width / 2),
-          y: slot.top + slot.height / 2 - (hero.top + hero.height / 2),
+          // slot is measured while the card sits 28px low for its entrance
+          y: slot.top + slot.height / 2 - (hero.top + hero.height / 2) - 28,
         });
       }
       setStage("dock");
@@ -109,7 +113,8 @@ export default function Login() {
 
   return (
     <main className="flex min-h-dvh items-center justify-center p-6">
-      {/* the travelling brand: starts huge & centered, docks into the card */}
+      {/* the travelling brand: flies fixed, then hands off to the in-card logo */}
+      {!settled && (
       <div className="pointer-events-none fixed inset-0 z-20 flex items-center justify-center">
         <motion.div
           ref={heroRef}
@@ -120,10 +125,14 @@ export default function Login() {
               : { x: 0, y: 0, scale: reduced ? SLOT / HERO : START_SCALE }
           }
           transition={reduced ? { duration: 0 } : DOCK_SPRING}
+          onAnimationComplete={() => {
+            if (docked && delta) setSettled(true);
+          }}
         >
           <LogoAnimated size={HERO} className="text-3xl" />
         </motion.div>
       </div>
+      )}
 
       <motion.div
         className="w-full max-w-sm"
@@ -139,8 +148,9 @@ export default function Login() {
             <div
               ref={slotRef}
               className="mx-auto mb-5 flex h-10 w-40 items-center justify-center"
-              aria-hidden
-            />
+            >
+              {settled && <Logo size={40} className="text-xl" />}
+            </div>
             <Button
               type="button"
               variant="outline"
