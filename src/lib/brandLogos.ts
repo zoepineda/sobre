@@ -11,9 +11,10 @@ const BRANDS: {
   raster?: true; // embedded bitmap — can't be recolored via CSS filters
   cardH?: number; // knockout height on cards (px) — compact marks get a boost
   nativeCard?: true; // render in its own color on cards (skip the white knockout)
+  cardLogo?: string; // card-specific variant (dark fills pre-swapped to white), shown unfiltered
 }[] = [
-  { match: /\bbpi\b/i, logo: "bpi.svg", color: "#b11116", cardH: 20, nativeCard: true },
-  { match: /\bbdo\b/i, logo: "bdo.svg", color: "#0b2972", nativeCard: true },
+  { match: /\bbpi\b/i, logo: "bpi.svg", color: "#b11116", cardH: 20, cardLogo: "bpi-card.svg" },
+  { match: /\bbdo\b/i, logo: "bdo.svg", color: "#0b2972", cardLogo: "bdo-card.svg" },
   { match: /metrobank|metro\s*bank/i, logo: "metrobank.svg", color: "#023184" },
   { match: /landbank|land\s*bank/i, logo: "landbank.svg", color: "#1cb14d", cardH: 26 },
   { match: /security\s*bank/i, logo: "security-bank.svg", color: "#0168b3" },
@@ -58,8 +59,8 @@ export function brandCardLogo(
   // native color only where the brand's own mark reads on the card
   // (e.g. Maya's mint green on the black wallet card — but the credit
   // card variant stays a white knockout to match its muted styling)
-  const knockout = !(hit.nativeCard && type !== "credit_card");
-  return { logo: hit.logo, height: hit.cardH ?? 18, knockout };
+  const knockout = !hit.cardLogo && !(hit.nativeCard && type !== "credit_card");
+  return { logo: hit.cardLogo ?? hit.logo, height: hit.cardH ?? 18, knockout };
 }
 
 export function brandColor(name: string, type: string): string {
