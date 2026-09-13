@@ -75,7 +75,11 @@ export default async function Income() {
             homeId: c.payday_account_id,
             isSystem: c.is_system,
           }))}
-          accounts={accounts.map((a) => ({ id: a.id, name: a.name }))}
+          accounts={accounts.map((a) => ({
+            id: a.id,
+            name: a.name,
+            type: a.type,
+          }))}
         />
         <Card className="py-4 shadow-sm">
           <CardContent className="space-y-3 px-4">

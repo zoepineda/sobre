@@ -12,6 +12,7 @@ import AddAccountForm from "@/components/AddAccountForm";
 import AddDialog from "@/components/AddDialog";
 import AddEnvelopeForm from "@/components/AddEnvelopeForm";
 import ArchiveDelete from "@/components/ArchiveDelete";
+import BrandChip from "@/components/BrandChip";
 import EnvelopeList from "@/components/EnvelopeList";
 import SetupAccountList from "@/components/SetupAccountList";
 import SetupTour from "@/components/SetupTour";
@@ -254,7 +255,10 @@ export default async function Settings({
                   <SelectContent>
                     {accounts.map((a) => (
                       <SelectItem key={a.id} value={String(a.id)}>
-                        {a.name}
+                        <span className="flex items-center gap-2">
+                          <BrandChip name={a.name} type={a.type} />
+                          {a.name}
+                        </span>
                       </SelectItem>
                     ))}
                   </SelectContent>

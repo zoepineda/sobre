@@ -63,7 +63,11 @@ export default async function StartingBalances() {
             balance: c.balance,
             homeAccountId: c.payday_account_id,
           }))}
-          accounts={accounts.map((a) => ({ id: a.id, name: a.name }))}
+          accounts={accounts.map((a) => ({
+            id: a.id,
+            name: a.name,
+            type: a.type,
+          }))}
           unassignedTotal={unassignedTotal}
         />
       )}

@@ -1,6 +1,7 @@
 import { getAccounts, getCategories } from "@/lib/queries";
 import Link from "next/link";
 import { addTransfer } from "@/lib/actions";
+import BrandChip from "@/components/BrandChip";
 import { todayISO } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -31,7 +32,10 @@ export default async function Transfer() {
       <SelectContent>
         {accounts.map((a) => (
           <SelectItem key={a.id} value={String(a.id)}>
-            {a.name}
+            <span className="flex items-center gap-2">
+              <BrandChip name={a.name} type={a.type} />
+              {a.name}
+            </span>
           </SelectItem>
         ))}
       </SelectContent>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { setStartingBalances } from "@/lib/actions";
+import BrandChip from "@/components/BrandChip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,7 @@ type Envelope = {
   balance: number;
   homeAccountId: number | null;
 };
-type Account = { id: number; name: string };
+type Account = { id: number; name: string; type: string };
 
 export default function StartingBalancesForm({
   envelopes,
@@ -64,7 +65,10 @@ export default function StartingBalancesForm({
               <SelectContent>
                 {accounts.map((a) => (
                   <SelectItem key={a.id} value={String(a.id)}>
-                    {a.name}
+                    <span className="flex items-center gap-2">
+                      <BrandChip name={a.name} type={a.type} />
+                      {a.name}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>

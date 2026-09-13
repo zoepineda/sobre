@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import BrandChip from "@/components/BrandChip";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,7 +20,7 @@ type Cat = {
   homeId: number | null;
   isSystem: boolean;
 };
-type Account = { id: number; name: string };
+type Account = { id: number; name: string; type: string };
 
 export default function IncomeSplits({
   categories,
@@ -86,7 +87,10 @@ export default function IncomeSplits({
               <SelectContent>
                 {accounts.map((a) => (
                   <SelectItem key={a.id} value={String(a.id)}>
-                    {a.name}
+                    <span className="flex items-center gap-2">
+                      <BrandChip name={a.name} type={a.type} />
+                      {a.name}
+                    </span>
                   </SelectItem>
                 ))}
               </SelectContent>
