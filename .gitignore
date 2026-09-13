@@ -1,0 +1,9 @@
+node_modules/
+.next/
+data/
+*.tsbuildinfo
+next-env.d.ts
+.env*
+certificates/
+.next-test/
+.DS_Store
