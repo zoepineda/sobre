@@ -158,7 +158,7 @@ export default async function Settings({
             <form action={createGroup} className="space-y-3">
               <Input
                 name="name"
-                placeholder="e.g. Emergency Fund, Wants"
+                placeholder="e.g. Savings, Wants, Needs"
                 required
               />
               <Button type="submit" className="w-full">

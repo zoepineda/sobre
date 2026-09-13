@@ -22,7 +22,7 @@ const STEPS: { target: string | null; title: string; body: string }[] = [
   {
     target: "groups",
     title: "Envelope groups",
-    body: "Big buckets that organize your envelopes — like Emergency Fund, Wants, or Loved Ones. On Home they collapse to one line each, so lots of envelopes stay tidy.",
+    body: "Big buckets that organize your envelopes — like Savings, Wants, or Needs. On Home they collapse to one line each, so lots of envelopes stay tidy.",
   },
   {
     target: "envelopes",
