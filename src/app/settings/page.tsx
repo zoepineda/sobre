@@ -14,6 +14,7 @@ import AddDialog from "@/components/AddDialog";
 import AddEnvelopeForm from "@/components/AddEnvelopeForm";
 import ArchiveDelete from "@/components/ArchiveDelete";
 import BrandChip from "@/components/BrandChip";
+import ConfettiPref from "@/components/ConfettiPref";
 import EnvelopeOption from "@/components/EnvelopeOption";
 import EnvelopeList from "@/components/EnvelopeList";
 import SetupAccountList from "@/components/SetupAccountList";
@@ -342,6 +343,17 @@ export default async function Settings({
       </section>
 
       </div>
+
+      <section className="space-y-2">
+        <h2 className="text-sm font-semibold text-muted-foreground">
+          Preferences
+        </h2>
+        <Card className="py-3 shadow-sm">
+          <CardContent className="px-4">
+            <ConfettiPref userId={user?.id} />
+          </CardContent>
+        </Card>
+      </section>
 
       {user && (
         <Card className="py-3 shadow-sm">

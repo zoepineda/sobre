@@ -19,6 +19,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import CashCard from "@/components/CashCard";
+import Celebrate from "@/components/Celebrate";
 import PaletteHint from "@/components/PaletteHint";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,7 +29,12 @@ import { getSessionUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function Dashboard() {
+export default async function Dashboard({
+  searchParams,
+}: {
+  searchParams: Promise<{ celebrate?: string }>;
+}) {
+  const { celebrate } = await searchParams;
   const month = todayISO().slice(0, 7);
   const [user, accounts, categories, groups, bills, spend, feed, holdingsByCategory] =
     await Promise.all([
@@ -125,6 +131,7 @@ export default async function Dashboard() {
 
   return (
     <main className="p-4 lg:p-8">
+      {celebrate && <Celebrate userId={user?.id} />}
       <PageReveal className="space-y-5">
       <header className="pt-3 lg:pt-0 flex items-end justify-between">
         <div>

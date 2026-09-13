@@ -91,7 +91,7 @@ export async function addIncome(formData: FormData) {
   }
   if (!accountId || splits.length === 0) return;
   await insertTransaction(uid, "income", date, note, splits);
-  done("/");
+  done("/?celebrate=1");
 }
 
 export async function logPayday(formData: FormData) {
@@ -120,7 +120,7 @@ export async function logPayday(formData: FormData) {
       amount: r.payday_target,
     }))
   );
-  done("/");
+  done("/?celebrate=1");
 }
 
 export async function addTransfer(formData: FormData) {
