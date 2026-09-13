@@ -61,7 +61,7 @@ const useFadeOut = (duration: number) => {
 export const Intro: React.FC<{ duration: number }> = ({ duration }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const tag = spring({ frame: frame - 34, fps, config: { damping: 15 } });
+  const tag = spring({ frame: frame - 58, fps, config: { damping: 15 } });
   return (
     <Stage>
       <AbsoluteFill
@@ -346,7 +346,7 @@ export const Spend: React.FC<{ duration: number }> = ({ duration }) => {
 export const Outro: React.FC<{ duration: number }> = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const url = spring({ frame: frame - 30, fps, config: { damping: 15 } });
+  const url = spring({ frame: frame - 56, fps, config: { damping: 15 } });
   return (
     <Stage>
       <AbsoluteFill

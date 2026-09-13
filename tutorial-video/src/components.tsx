@@ -31,13 +31,24 @@ export const Rise: React.FC<{
   );
 };
 
-/** The real Sobre V2 mark, straight from src/components/Logo.tsx:
- * wobbly hand-drawn envelope, eyes peeking over the rim, amber tile. */
+/** The real Sobre V2 mark with the full LogoAnimated storyboard, frame-exact:
+ *    0ms  amber tile pops in (scale .6 → 1, springy)
+ *  140ms  envelope + flap rise in
+ *  340ms  left eye pops   440ms  right eye pops
+ *  700ms  pupils glance left → right → settle
+ * 1150ms  "Sobre" letters stagger up, 70ms apart               */
 const SW = 3.2;
-const Eye: React.FC<{ cx: number; open: number }> = ({ cx, open }) => (
-  <g transform={`translate(${cx} 19) scale(1 ${open}) translate(${-cx} -19)`}>
+const POP = { stiffness: 420, damping: 17 };
+const RISE_SPRING = { stiffness: 300, damping: 24 };
+
+const Eye: React.FC<{ cx: number; open: number; pupilShift: number }> = ({
+  cx,
+  open,
+  pupilShift,
+}) => (
+  <g transform={`translate(${cx} 19) scale(${open}) translate(${-cx} -19)`}>
     <circle cx={cx} cy={19} r={5.5} fill={PAPER} stroke={INK} strokeWidth={SW} />
-    <circle cx={cx - 1.2} cy={19.8} r={5.5 * 0.62} fill={INK} />
+    <circle cx={cx + pupilShift} cy={19.8} r={5.5 * 0.62} fill={INK} />
   </g>
 );
 
@@ -45,10 +56,33 @@ export const SobreLogo: React.FC<{ size?: number; delay?: number }> = ({
   size = 96,
   delay = 0,
 }) => {
-  const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const pop = spring({ frame: frame - delay, fps, config: { damping: 12 } });
-  const eyes = spring({ frame: frame - delay - 8, fps, config: { damping: 14 } });
+  const frame = useCurrentFrame() - delay;
+  const sec = (s: number) => s * fps;
+  const sp = (
+    start: number,
+    config: { stiffness: number; damping: number }
+  ) => spring({ frame: frame - start, fps, config });
+
+  const tile = sp(0, POP);
+  const body = sp(sec(0.14), RISE_SPRING);
+  const eyeL = sp(sec(0.34), POP);
+  const eyeR = sp(sec(0.44), POP);
+
+  // glance: left, right, settle (matches the app's keyframes/times)
+  const g = sec(0.7);
+  const glanceDur = sec(0.9);
+  const pupilShift = interpolate(
+    frame,
+    [g, g + glanceDur * 0.25, g + glanceDur * 0.65, g + glanceDur],
+    [-1.2, -2, 1.8, -1.2],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: (t) => 0.5 - Math.cos(Math.PI * t) / 2,
+    }
+  );
+
   return (
     <div style={{ display: "flex", alignItems: "center", gap: size * 0.2 }}>
       <svg
@@ -57,28 +91,34 @@ export const SobreLogo: React.FC<{ size?: number; delay?: number }> = ({
         viewBox="0 0 48 48"
         fill="none"
         style={{
-          transform: `scale(${pop})`,
+          transform: `scale(${interpolate(tile, [0, 1], [0.6, 1])})`,
+          opacity: tile,
           filter: "drop-shadow(0 10px 26px rgba(26,29,36,0.2))",
         }}
       >
         <rect width="48" height="48" rx="10" fill={AMBER} />
-        <path
-          d="M9.2 21.4 Q8.6 20.2 10 19.9 L23.2 19.4 L38.2 19.8 Q39.6 19.8 39.7 21.2 L40.2 37.4 Q40.3 39.5 38.4 39.6 L10.4 40.2 Q8.6 40.2 8.5 38.4 Z"
-          fill="none"
-          stroke={INK}
-          strokeWidth={SW}
-          strokeLinejoin="round"
-        />
-        <path
-          d="M9.6 21.2 L24 31 L39.3 20.8"
-          stroke={INK}
-          strokeWidth={SW}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-        <Eye cx={17.75} open={eyes} />
-        <Eye cx={30.25} open={eyes} />
+        <g
+          transform={`translate(0 ${interpolate(body, [0, 1], [6, 0])})`}
+          opacity={body}
+        >
+          <path
+            d="M9.2 21.4 Q8.6 20.2 10 19.9 L23.2 19.4 L38.2 19.8 Q39.6 19.8 39.7 21.2 L40.2 37.4 Q40.3 39.5 38.4 39.6 L10.4 40.2 Q8.6 40.2 8.5 38.4 Z"
+            fill="none"
+            stroke={INK}
+            strokeWidth={SW}
+            strokeLinejoin="round"
+          />
+          <path
+            d="M9.6 21.2 L24 31 L39.3 20.8"
+            stroke={INK}
+            strokeWidth={SW}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          />
+        </g>
+        <Eye cx={17.75} open={eyeL} pupilShift={pupilShift} />
+        <Eye cx={30.25} open={eyeR} pupilShift={pupilShift} />
       </svg>
       <div
         style={{
@@ -87,10 +127,24 @@ export const SobreLogo: React.FC<{ size?: number; delay?: number }> = ({
           letterSpacing: "-0.02em",
           fontSize: size * 0.72,
           color: INK,
-          opacity: eyes,
+          display: "flex",
         }}
       >
-        Sobre
+        {"Sobre".split("").map((ch, i) => {
+          const p = sp(sec(1.15 + i * 0.07), POP);
+          return (
+            <span
+              key={i}
+              style={{
+                display: "inline-block",
+                opacity: p,
+                transform: `translateY(${interpolate(p, [0, 1], [10, 0])}px)`,
+              }}
+            >
+              {ch}
+            </span>
+          );
+        })}
       </div>
     </div>
   );
