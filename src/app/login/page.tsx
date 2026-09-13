@@ -24,6 +24,7 @@ import { createClient } from "@/lib/supabase/client";
  * ───────────────────────────────────────────────────────── */
 
 const START_SCALE = 2.1;
+const START_SCALE_MOBILE = 1.6; // phones get a gentler hero so it fits comfortably
 const LOGO_DONE = 2.05; // s — let the logo's own storyboard finish
 const HOLD_BEAT = 0.3; // s — beat of stillness before the dock
 const CARD_DELAY = 0.34; // s — card trails the docking logo
@@ -39,6 +40,11 @@ export default function Login() {
   // stage machine: center → dock (card enters alongside)
   const [stage, setStage] = useState<"center" | "dock">("center");
   const [settled, setSettled] = useState(false);
+  const [startScale] = useState(() =>
+    typeof window !== "undefined" && window.innerWidth < 640
+      ? START_SCALE_MOBILE
+      : START_SCALE
+  );
   const [delta, setDelta] = useState<{ x: number; y: number } | null>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const slotRef = useRef<HTMLDivElement>(null);
@@ -122,7 +128,7 @@ export default function Login() {
           animate={
             docked && delta
               ? { x: delta.x, y: delta.y, scale: SLOT / HERO }
-              : { x: 0, y: 0, scale: reduced ? SLOT / HERO : START_SCALE }
+              : { x: 0, y: 0, scale: reduced ? SLOT / HERO : startScale }
           }
           transition={reduced ? { duration: 0 } : DOCK_SPRING}
           onAnimationComplete={() => {
