@@ -22,10 +22,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { peso, prettyDate, todayISO } from "@/lib/format";
+import { getSessionUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function Dashboard() {
+  const user = await getSessionUser();
   const accounts = await getAccounts();
   const categories = await getCategories();
   const groups = await getGroups();
@@ -65,6 +67,19 @@ export default async function Dashboard() {
     day: "numeric",
     year: "numeric",
   });
+  // greeting follows Philippine time regardless of where the server runs
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      hour12: false,
+      timeZone: "Asia/Manila",
+    }).format(new Date())
+  );
+  const daypart =
+    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const greeting = user?.firstName
+    ? `${daypart}, ${user.firstName}!`
+    : `${daypart}!`;
 
   const envelopeRows = (list: typeof categories) => (
     <div className="divide-y divide-border/60">
@@ -110,7 +125,10 @@ export default async function Dashboard() {
           <h1 className="lg:hidden">
             <Logo size={26} className="text-xl" />
           </h1>
-          <p className="text-xs uppercase tracking-wider text-muted-foreground lg:text-sm lg:font-semibold lg:text-foreground">
+          <p className="font-heading text-base font-bold lg:text-xl">
+            {greeting}
+          </p>
+          <p className="text-[11px] uppercase tracking-wider text-muted-foreground">
             {todayLabel}
           </p>
         </div>

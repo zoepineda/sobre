@@ -25,6 +25,33 @@ export async function createClient() {
   );
 }
 
+export type SessionUser = {
+  id: string;
+  email: string | null;
+  name: string | null;
+  firstName: string | null;
+  avatarUrl: string | null;
+};
+
+// Nullable variant for chrome (nav, greetings) — never redirects.
+export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return null;
+  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const name =
+    (meta.full_name as string) || (meta.name as string) || null;
+  return {
+    id: user.id,
+    email: user.email ?? null,
+    name,
+    firstName: name ? name.split(" ")[0] : null,
+    avatarUrl: (meta.avatar_url as string) || (meta.picture as string) || null,
+  };
+});
+
 // Per-request cached user id; redirects to /login when signed out.
 export const getUserId = cache(async (): Promise<string> => {
   const supabase = await createClient();
