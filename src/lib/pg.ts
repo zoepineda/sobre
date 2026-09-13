@@ -13,6 +13,8 @@ export const sql =
     max: 4,
     idle_timeout: 20,
     connect_timeout: 10,
+    // Supabase transaction pooler (needed on Vercel) can't do prepared statements
+    prepare: false,
   });
 
 if (process.env.NODE_ENV !== "production") globalThis.__sobreSql = sql;
