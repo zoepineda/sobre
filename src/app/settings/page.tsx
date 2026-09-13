@@ -19,6 +19,7 @@ import EnvelopeOption from "@/components/EnvelopeOption";
 import EnvelopeList from "@/components/EnvelopeList";
 import SetupAccountList from "@/components/SetupAccountList";
 import SetupTour from "@/components/SetupTour";
+import TutorialVideo from "@/components/TutorialVideo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -75,6 +76,7 @@ export default async function Settings({
       <div className="pt-3 lg:pt-0 flex items-center gap-2">
         <h1 className="text-xl font-bold">Setup</h1>
         <SetupTour userId={user?.id} />
+        <TutorialVideo />
       </div>
 
       {error === "account-in-use" ? (
