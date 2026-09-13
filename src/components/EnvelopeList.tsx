@@ -26,6 +26,7 @@ import { peso } from "@/lib/format";
 type Envelope = {
   id: number;
   name: string;
+  icon: string;
   is_system: boolean;
   group_id: number | null;
   payday_target: number;
@@ -36,13 +37,17 @@ type Envelope = {
 type Group = { id: number; name: string };
 type Account = { id: number; name: string };
 
-// Fixed leading slot keeps names on one left rail whether or not they
-// start with an emoji.
-const EMOJI_RE = /^([\p{Extended_Pictographic}️‍]+)\s*/u;
-function splitEmoji(name: string): [string | null, string] {
-  const m = name.match(EMOJI_RE);
-  return m ? [m[1], name.slice(m[0].length)] : [null, name];
-}
+// Curated LineIcons for envelopes — money, home, transit, food, life.
+export const ENVELOPE_ICONS = [
+  "lni-shield-2", "lni-wallet-1", "lni-dollar-circle", "lni-bar-chart-dollar",
+  "lni-home-2", "lni-bulb-4", "lni-water-drop-1", "lni-signal-app",
+  "lni-telephone-1", "lni-cloud-2", "lni-camera-movie-1", "lni-game-pad-modern-1",
+  "lni-headphone-1", "lni-bus-1", "lni-car-2", "lni-train-1",
+  "lni-aeroplane-1", "lni-knife-fork-1", "lni-burger-1", "lni-coffee-cup-2",
+  "lni-cake-1", "lni-cart-1", "lni-basket-shopping-3", "lni-shirt-1",
+  "lni-dumbbell-1", "lni-heart", "lni-user-multiple-4", "lni-box-gift-1",
+  "lni-book-1", "lni-graduation-cap-1", "lni-hospital-2", "lni-star-fat",
+];
 
 export default function EnvelopeList({
   envelopes,
@@ -54,6 +59,7 @@ export default function EnvelopeList({
   accounts: Account[];
 }) {
   const [editing, setEditing] = useState<Envelope | null>(null);
+  const [icon, setIcon] = useState("");
 
   const real = envelopes.filter((e) => !e.is_system);
   const unassigned = envelopes.find((e) => e.is_system && e.balance !== 0);
@@ -75,19 +81,24 @@ export default function EnvelopeList({
     sections.push({ key: "none", title: "No group", list: ungrouped });
 
   const row = (e: Envelope) => {
-    const [emoji, label] = splitEmoji(e.name);
     return (
       <button
         key={e.id}
         type="button"
-        onClick={() => setEditing(e)}
+        onClick={() => {
+          setEditing(e);
+          setIcon(e.icon);
+        }}
         className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left hover:bg-muted/50"
       >
-        <span className="w-6 shrink-0 text-center text-base" aria-hidden>
-          {emoji ?? ""}
+        <span
+          className="flex size-7 shrink-0 items-center justify-center rounded-md bg-secondary text-secondary-foreground"
+          aria-hidden
+        >
+          {e.icon ? <i className={`lni ${e.icon} text-sm`} /> : null}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-sm font-medium">{label}</span>
+          <span className="block truncate text-sm font-medium">{e.name}</span>
           <span className="block truncate text-[11px] text-muted-foreground">
             {e.payday_account_name ? `→ ${e.payday_account_name}` : "no home account"}
             {e.balance !== 0 && (
@@ -174,6 +185,40 @@ export default function EnvelopeList({
             <div key={editing.id} className="space-y-4">
               <form action={updateCategory} className="space-y-3">
                 <input type="hidden" name="id" value={editing.id} />
+                <input type="hidden" name="icon" value={icon} />
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">Icon</Label>
+                  <div className="grid grid-cols-8 gap-1">
+                    <button
+                      type="button"
+                      aria-label="No icon"
+                      onClick={() => setIcon("")}
+                      className={`flex h-9 items-center justify-center rounded-md border text-xs ${
+                        icon === ""
+                          ? "border-primary bg-secondary text-secondary-foreground"
+                          : "border-border text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      —
+                    </button>
+                    {ENVELOPE_ICONS.map((name) => (
+                      <button
+                        key={name}
+                        type="button"
+                        aria-label={name.replace("lni-", "").replace(/-/g, " ")}
+                        aria-pressed={icon === name}
+                        onClick={() => setIcon(name)}
+                        className={`flex h-9 items-center justify-center rounded-md border ${
+                          icon === name
+                            ? "border-primary bg-secondary text-secondary-foreground"
+                            : "border-border text-muted-foreground hover:bg-muted"
+                        }`}
+                      >
+                        <i className={`lni ${name} text-sm`} aria-hidden />
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className="space-y-1">
                   <Label htmlFor="env-name" className="text-xs text-muted-foreground">
                     Name

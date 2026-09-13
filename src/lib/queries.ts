@@ -17,6 +17,7 @@ export type Account = {
 export type Category = {
   id: number;
   name: string;
+  icon: string;
   archived: boolean;
   is_system: boolean;
   sort: number;
@@ -52,7 +53,7 @@ export async function getCategories(
 ): Promise<Category[]> {
   const uid = await getUserId();
   return (await sql`
-    SELECT c.id, c.name, c.archived, c.is_system, c.sort, c.group_id,
+    SELECT c.id, c.name, c.icon, c.archived, c.is_system, c.sort, c.group_id,
       c.payday_target, c.payday_account_id,
       a.name AS payday_account_name,
       COALESCE(SUM(l.amount), 0)::int AS balance

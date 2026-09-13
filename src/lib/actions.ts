@@ -246,10 +246,12 @@ export async function updateCategory(formData: FormData) {
   const groupId = Number(formData.get("group_id")) || null;
   const target = toCentavos((formData.get("payday_target") as string) || "0");
   const accountId = Number(formData.get("payday_account_id")) || null;
+  const icon = ((formData.get("icon") as string) || "").trim();
   if (!id || !name) return;
   await sql`
     UPDATE categories SET
       name = ${name},
+      icon = ${icon},
       group_id = ${groupId},
       payday_target = ${Number.isFinite(target) && target > 0 ? target : 0},
       payday_account_id = ${accountId}
