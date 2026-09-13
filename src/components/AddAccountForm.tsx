@@ -22,31 +22,43 @@ function brandMark(name: string) {
 }
 
 // Known PH banks/wallets — suggested only while typing (never a full dump),
-// and picking one auto-fills the account type.
-const KNOWN: { name: string; type: string }[] = [
-  { name: "BPI", type: "bank" },
-  { name: "BDO", type: "bank" },
-  { name: "Metrobank", type: "bank" },
-  { name: "Landbank", type: "bank" },
-  { name: "Security Bank", type: "bank" },
-  { name: "PNB", type: "bank" },
-  { name: "RCBC", type: "bank" },
-  { name: "UnionBank", type: "bank" },
-  { name: "CIMB", type: "bank" },
-  { name: "MariBank", type: "bank" },
-  { name: "GoTyme", type: "bank" },
-  { name: "Tonik", type: "bank" },
-  { name: "SeaBank", type: "bank" },
-  { name: "UNO Digital Bank", type: "bank" },
-  { name: "OwnBank", type: "bank" },
-  { name: "Komo", type: "bank" },
-  { name: "GCash", type: "ewallet" },
-  { name: "Maya", type: "ewallet" },
-  { name: "GrabPay", type: "ewallet" },
-  { name: "ShopeePay", type: "ewallet" },
-  { name: "Coins.ph", type: "ewallet" },
+// and picking one auto-fills the account type. logo files live in
+// public/brands/; chip picks the background the mark reads best on.
+const KNOWN: {
+  name: string;
+  type: string;
+  logo?: string;
+  chip?: "light" | "dark" | "red";
+}[] = [
+  { name: "BPI", type: "bank", logo: "bpi.svg" },
+  { name: "BDO", type: "bank", logo: "bdo.svg" },
+  { name: "Metrobank", type: "bank", logo: "metrobank.svg" },
+  { name: "Landbank", type: "bank", logo: "landbank.svg" },
+  { name: "Security Bank", type: "bank", logo: "security-bank.svg" },
+  { name: "PNB", type: "bank", logo: "pnb.svg" },
+  { name: "RCBC", type: "bank", logo: "rcbc.svg" },
+  { name: "UnionBank", type: "bank", logo: "unionbank.svg" },
+  { name: "CIMB", type: "bank", logo: "cimb.svg", chip: "red" },
+  { name: "MariBank", type: "bank", logo: "maribank.svg" },
+  { name: "GoTyme", type: "bank", logo: "gotyme.svg" },
+  { name: "Tonik", type: "bank", logo: "tonik.svg" },
+  { name: "SeaBank", type: "bank", logo: "seabank.svg" },
+  { name: "UNO Digital Bank", type: "bank", logo: "uno.svg" },
+  { name: "OwnBank", type: "bank", logo: "ownbank.svg", chip: "dark" },
+  { name: "Komo", type: "bank", logo: "komo.svg" },
+  { name: "GCash", type: "ewallet", logo: "gcash.svg" },
+  { name: "Maya", type: "ewallet", logo: "maya.svg", chip: "dark" },
+  { name: "GrabPay", type: "ewallet", logo: "grabpay.svg" },
+  { name: "ShopeePay", type: "ewallet", logo: "shopeepay.svg" },
+  { name: "Coins.ph", type: "ewallet", logo: "coins-ph.svg" },
   { name: "Wallet cash", type: "cash" },
 ];
+
+const CHIP_BG: Record<string, string> = {
+  light: "bg-white border border-border/60",
+  dark: "bg-[#101014]",
+  red: "bg-[#DC241F]",
+};
 
 export default function AddAccountForm() {
   const [name, setName] = useState("");
@@ -125,16 +137,30 @@ export default function AddAccountForm() {
                   }}
                 >
                   <span className="flex items-center gap-2.5">
-                    <span
-                      aria-hidden
-                      className="flex h-6 w-9 shrink-0 items-center justify-center rounded-[5px] text-[9px] font-bold tracking-wide shadow-sm"
-                      style={{
-                        background: cardStyle(k.name, k.type).bg,
-                        color: cardStyle(k.name, k.type).fg,
-                      }}
-                    >
-                      {brandMark(k.name)}
-                    </span>
+                    {k.logo ? (
+                      <span
+                        aria-hidden
+                        className={`flex h-6 w-10 shrink-0 items-center justify-center rounded-[5px] px-1 shadow-sm ${CHIP_BG[k.chip ?? "light"]}`}
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                          src={`/brands/${k.logo}`}
+                          alt=""
+                          className="max-h-4 max-w-full object-contain"
+                        />
+                      </span>
+                    ) : (
+                      <span
+                        aria-hidden
+                        className="flex h-6 w-10 shrink-0 items-center justify-center rounded-[5px] text-[9px] font-bold tracking-wide shadow-sm"
+                        style={{
+                          background: cardStyle(k.name, k.type).bg,
+                          color: cardStyle(k.name, k.type).fg,
+                        }}
+                      >
+                        {brandMark(k.name)}
+                      </span>
+                    )}
                     {k.name}
                   </span>
                   <span className="text-[11px] uppercase tracking-wide text-muted-foreground">
