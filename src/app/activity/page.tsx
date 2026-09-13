@@ -83,7 +83,7 @@ export default async function Activity({
       {feed.length === 0 ? (
         <Card className="py-5 shadow-sm">
           <p className="text-center text-sm text-muted-foreground">
-            Nothing yet — log your first expense from the + tab.
+            Nothing yet. Log your first expense from the + tab.
           </p>
         </Card>
       ) : (

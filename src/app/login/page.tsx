@@ -109,7 +109,7 @@ export default function Login() {
     if (!data.session) {
       setMode("signin");
       setNotice(
-        "Almost there — check your email for the confirmation link, then come back and sign in."
+        "Almost there! Check your email for the confirmation link, then come back and sign in."
       );
       return;
     }

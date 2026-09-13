@@ -77,8 +77,8 @@ export default async function Transfer({
     <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-xl space-y-4">
       <h1 className="pt-3 lg:pt-0 text-xl font-bold">Move money</h1>
       <p className="text-xs text-muted-foreground">
-        Between accounts, between envelopes, or both at once — e.g. topping up
-        an overspent envelope, or distributing Unassigned money. Seeding all
+        Between accounts, between envelopes, or both at once, e.g. topping up
+        an overspent envelope or distributing Unassigned money. Seeding all
         your envelopes at once?{" "}
         <Link href="/starting-balances" className="font-medium text-primary">
           Set starting balances →

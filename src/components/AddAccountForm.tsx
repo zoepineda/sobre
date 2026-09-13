@@ -162,7 +162,7 @@ export default function AddAccountForm() {
         />
       </div>
       <p className="text-[11px] text-muted-foreground">
-        Opening balances land in the Unassigned envelope — use Move to
+        Opening balances land in the Unassigned envelope. Use Move to
         distribute them. Credit cards start at zero owed.
       </p>
       <Button type="submit" className="w-full">

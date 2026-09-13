@@ -92,7 +92,7 @@ export default async function AccountDetail({
             <p className="text-center text-sm text-muted-foreground">
               {isCard
                 ? "No envelope owes this card."
-                : "No envelope money in this account yet — log income into it or Move money here."}
+                : "No envelope money in this account yet. Log income into it or Move money here."}
             </p>
           </Card>
         ) : (
@@ -119,7 +119,7 @@ export default async function AccountDetail({
         {!isCard && envelopes.length > 0 && (
           <p className="mt-1 text-[11px] text-muted-foreground">
             This is derived from every transaction, so it always matches
-            reality — use{" "}
+            reality. Use{" "}
             <Link href="/transfer" className="text-primary underline">
               Move
             </Link>{" "}

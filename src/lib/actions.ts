@@ -210,7 +210,7 @@ export async function createAccount(formData: FormData) {
 
   if (Number.isFinite(opening) && opening !== 0 && type !== "credit_card") {
     const unassigned = await ensureUnassigned(uid);
-    await insertTransaction(uid, "opening", todayISO(), `Opening balance — ${name}`, [
+    await insertTransaction(uid, "opening", todayISO(), `Opening balance: ${name}`, [
       { account_id: accountId as number, category_id: unassigned, amount: opening },
     ]);
   }

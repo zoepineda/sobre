@@ -88,7 +88,7 @@ export default function CardPayForm({
             </SelectContent>
           </Select>
           <p className="text-[11px] text-muted-foreground">
-            Paying from several accounts? Record one payment per account —
+            Paying from several accounts? Record one payment per account, and
             edit the envelope amounts above for each.
           </p>
         </div>

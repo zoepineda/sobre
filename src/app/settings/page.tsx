@@ -76,13 +76,13 @@ export default async function Settings({
 
       {error === "account-in-use" ? (
         <p className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
-          Envelopes or bills still use that account as their payday home —
-          point them somewhere else (tap the envelope to edit) before
+          Envelopes or bills still use that account as their payday home.
+          Point them somewhere else (tap the envelope to edit) before
           archiving it.
         </p>
       ) : error ? (
         <p className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
-          That {error} still holds money — move its balance elsewhere (or pay
+          That {error} still holds money. Move its balance elsewhere (or pay
           off the card) before archiving, so nothing disappears from your
           totals.
         </p>
@@ -226,7 +226,7 @@ export default async function Settings({
           categories.filter((c) => !c.is_system).length === 0 ? (
             <AddDialog title="Add recurring bill" trigger="Bill">
               <p className="text-sm text-muted-foreground">
-                Bills need a home — add at least one account and one envelope
+                Bills need a home. Add at least one account and one envelope
                 first, then come back here.
               </p>
             </AddDialog>
@@ -297,7 +297,7 @@ export default async function Settings({
                 </Select>
               </div>
               <p className="text-[11px] text-muted-foreground">
-                Shows as a monthly checklist on Home — ticking logs the expense
+                Shows as a monthly checklist on Home. Ticking logs the expense
                 from the chosen account &amp; envelope.
               </p>
               <Button type="submit" className="w-full">
@@ -332,7 +332,7 @@ export default async function Settings({
         ) : (
           <Card className="py-5 shadow-sm">
             <p className="px-4 text-center text-sm text-muted-foreground">
-              No recurring bills yet — add one to get a monthly tick-off
+              No recurring bills yet. Add one to get a monthly tick-off
               checklist on Home.
             </p>
           </Card>

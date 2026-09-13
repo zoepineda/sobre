@@ -49,7 +49,7 @@ export default async function PayeesPage() {
         <Card className="py-5 shadow-sm">
           <CardContent>
             <p className="text-center text-sm text-muted-foreground">
-              Nothing here yet — add a &quot;where / what for&quot; when logging
+              Nothing here yet. Add a &quot;where / what for&quot; when logging
               expenses and they&apos;ll show up ranked here.
             </p>
           </CardContent>

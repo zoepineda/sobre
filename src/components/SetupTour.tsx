@@ -17,12 +17,12 @@ const STEPS: { target: string | null; title: string; body: string }[] = [
   {
     target: "accounts",
     title: "Accounts",
-    body: "Where your money physically lives — banks, e-wallets, cash, and your credit card. One account can hold money belonging to many envelopes. Drag rows to reorder them everywhere.",
+    body: "Where your money physically lives: banks, e-wallets, cash, and your credit card. One account can hold money belonging to many envelopes. Drag rows to reorder them everywhere.",
   },
   {
     target: "groups",
     title: "Envelope groups",
-    body: "Big buckets that organize your envelopes — like Savings, Wants, or Needs. On Home they collapse to one line each, so lots of envelopes stay tidy.",
+    body: "Big buckets that organize your envelopes, like Savings, Wants, or Needs. On Home they collapse to one line each, so lots of envelopes stay tidy.",
   },
   {
     target: "envelopes",
@@ -32,12 +32,12 @@ const STEPS: { target: string | null; title: string; body: string }[] = [
   {
     target: "bills",
     title: "Recurring bills",
-    body: "Bills you pay every month become a checklist on Home. Ticking one logs the expense from the right account and envelope automatically — no double entry.",
+    body: "Bills you pay every month become a checklist on Home. Ticking one logs the expense from the right account and envelope automatically, no double entry.",
   },
   {
     target: null,
     title: "That's the tour! 🎉",
-    body: "Add your accounts and envelopes here, then log income on the Income page — one tap on “Log payday” fills every envelope in one go. Head to Home to see it all come together.",
+    body: "Add your accounts and envelopes here, then log income on the Income page. One tap on “Log payday” fills every envelope in one go. Head to Home to see it all come together.",
   },
 ];
 

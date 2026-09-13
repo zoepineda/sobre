@@ -105,7 +105,7 @@ export default function StartingBalancesForm({
         </Card>
         {over && (
           <p className="text-center text-xs text-destructive">
-            That&apos;s more than what&apos;s sitting in Unassigned — the
+            That&apos;s more than what&apos;s sitting in Unassigned. The
             extra would push Unassigned negative. Double-check the amounts
             (or your accounts&apos; opening balances).
           </p>

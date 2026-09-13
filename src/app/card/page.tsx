@@ -26,7 +26,7 @@ export default async function CardPage({
     return (
       <main className="p-5 pt-14 text-center">
         <p className="text-muted-foreground">
-          No credit card yet — add one in{" "}
+          No credit card yet. Add one in{" "}
           <Link href="/settings" className="text-primary underline">
             Setup
           </Link>{" "}
@@ -87,7 +87,7 @@ export default async function CardPage({
 
       {debts.length === 0 ? (
         <p className="rounded-2xl bg-card p-5 text-center text-sm text-muted-foreground shadow-sm">
-          All settled — no envelope owes this card. 🎉
+          All settled. No envelope owes this card. 🎉
         </p>
       ) : (
         <section>
@@ -114,7 +114,7 @@ export default async function CardPage({
                           holdings
                             .map((h) => `${h.name} ${peso(h.amount)}`)
                             .join(" · ")
-                        : "no cash held for this envelope — rebalance first"}
+                        : "no cash held for this envelope, rebalance first"}
                     </p>
                   </div>
                 );

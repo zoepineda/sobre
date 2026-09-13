@@ -29,7 +29,7 @@ export default async function StartingBalances() {
       <h1 className="pt-3 lg:pt-0 text-xl font-bold">Set starting balances</h1>
       <p className="text-xs text-muted-foreground">
         Type what each envelope currently holds in real life. This relabels
-        money out of Unassigned within each envelope&apos;s account — account
+        money out of Unassigned within each envelope&apos;s account. Account
         balances stay untouched, and nothing shows up as income.
       </p>
 
@@ -47,7 +47,7 @@ export default async function StartingBalances() {
 
       {envelopes.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          No envelopes yet — create them in Setup first.
+          No envelopes yet. Create them in Setup first.
         </p>
       ) : unassignedTotal <= 0 ? (
         <p className="text-sm text-muted-foreground">

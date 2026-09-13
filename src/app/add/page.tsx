@@ -104,7 +104,7 @@ export default async function AddExpense() {
               </Select>
               <p className="text-[11px] text-muted-foreground">
                 Pick your credit card and the envelope&apos;s money is reserved
-                for payback — no cash moves yet.
+                for payback. No cash moves yet.
               </p>
             </div>
             <div className="space-y-1">
