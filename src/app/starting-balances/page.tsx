@@ -1,3 +1,4 @@
+import PageReveal from "@/components/motion/PageReveal";
 import { getAccounts, getAllCategoryHoldings, getCategories } from "@/lib/queries";
 import StartingBalancesForm from "@/components/StartingBalancesForm";
 import { peso } from "@/lib/format";
@@ -25,7 +26,8 @@ export default async function StartingBalances() {
   );
 
   return (
-    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-xl space-y-4">
+    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-xl">
+      <PageReveal className="space-y-4">
       <h1 className="pt-3 lg:pt-0 text-xl font-bold">Set starting balances</h1>
       <p className="text-xs text-muted-foreground">
         Type what each envelope currently holds in real life. This relabels
@@ -71,6 +73,7 @@ export default async function StartingBalances() {
           unassignedTotal={unassignedTotal}
         />
       )}
+    </PageReveal>
     </main>
   );
 }

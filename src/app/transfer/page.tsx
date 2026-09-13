@@ -1,3 +1,4 @@
+import PageReveal from "@/components/motion/PageReveal";
 import { getAccounts, getCategories } from "@/lib/queries";
 import Link from "next/link";
 import { addTransfer } from "@/lib/actions";
@@ -74,7 +75,8 @@ export default async function Transfer({
   );
 
   return (
-    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-xl space-y-4">
+    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-xl">
+      <PageReveal className="space-y-4">
       <h1 className="pt-3 lg:pt-0 text-xl font-bold">Move money</h1>
       <p className="text-xs text-muted-foreground">
         Between accounts, between envelopes, or both at once, e.g. topping up
@@ -164,6 +166,7 @@ export default async function Transfer({
           Move it
         </Button>
       </form>
+    </PageReveal>
     </main>
   );
 }

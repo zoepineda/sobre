@@ -1,3 +1,4 @@
+import PageReveal from "@/components/motion/PageReveal";
 import { getAccounts, getCategories } from "@/lib/queries";
 import { addIncome, logPayday } from "@/lib/actions";
 import { peso, todayISO } from "@/lib/format";
@@ -35,7 +36,8 @@ export default async function Income({
   }
 
   return (
-    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-xl space-y-4">
+    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-xl">
+      <PageReveal className="space-y-4">
       <h1 className="pt-3 lg:pt-0 text-xl font-bold">Log income</h1>
 
       {template.length > 0 && (
@@ -117,6 +119,7 @@ export default async function Income({
           Save income
         </Button>
       </form>
+    </PageReveal>
     </main>
   );
 }

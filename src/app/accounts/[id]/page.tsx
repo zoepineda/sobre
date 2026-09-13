@@ -1,3 +1,4 @@
+import PageReveal from "@/components/motion/PageReveal";
 import Link from "next/link";
 import {
   getAccountById,
@@ -36,7 +37,8 @@ export default async function AccountDetail({
   const isCard = account.type === "credit_card";
 
   return (
-    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-2xl space-y-4">
+    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-2xl">
+      <PageReveal className="space-y-4">
       <header className="pt-3 lg:pt-0">
         <Link href="/" className="text-xs text-primary">
           ← Home
@@ -169,6 +171,7 @@ export default async function AccountDetail({
           </Card>
         )}
       </section>
+    </PageReveal>
     </main>
   );
 }

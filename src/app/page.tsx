@@ -1,3 +1,4 @@
+import PageReveal from "@/components/motion/PageReveal";
 import Link from "next/link";
 import {
   getAccounts,
@@ -123,7 +124,8 @@ export default async function Dashboard() {
   );
 
   return (
-    <main className="p-4 lg:p-8 space-y-5">
+    <main className="p-4 lg:p-8">
+      <PageReveal className="space-y-5">
       <header className="pt-3 lg:pt-0 flex items-end justify-between">
         <div>
           <h1 className="lg:hidden">
@@ -378,6 +380,7 @@ export default async function Dashboard() {
       )}
       </div>
       </div>
+    </PageReveal>
     </main>
   );
 }

@@ -1,3 +1,4 @@
+import PageReveal from "@/components/motion/PageReveal";
 import Link from "next/link";
 import { getCategories, getGroupById, getGroupOutflows } from "@/lib/queries";
 import { peso, prettyDate } from "@/lib/format";
@@ -28,7 +29,8 @@ export default async function GroupDetail({
   const outflows = await getGroupOutflows(group.id, 100);
 
   return (
-    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-2xl space-y-4">
+    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-2xl">
+      <PageReveal className="space-y-4">
       <header className="pt-3">
         <Link href="/" className="text-xs text-primary">
           ← Home
@@ -77,6 +79,7 @@ export default async function GroupDetail({
           </div>
         )}
       </section>
+    </PageReveal>
     </main>
   );
 }

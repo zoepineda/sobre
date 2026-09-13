@@ -1,3 +1,4 @@
+import PageReveal from "@/components/motion/PageReveal";
 import Link from "next/link";
 import { getAccounts, getCategories, getPayeeSuggestions } from "@/lib/queries";
 import BrandChip from "@/components/BrandChip";
@@ -44,7 +45,8 @@ export default async function AddExpense() {
   }
 
   return (
-    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-xl space-y-4">
+    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-xl">
+      <PageReveal className="space-y-4">
       <h1 className="pt-3 lg:pt-0 text-xl font-bold">Log expense</h1>
       <form action={addExpense} className="space-y-4">
         <Card className="py-4 shadow-sm">
@@ -163,6 +165,7 @@ export default async function AddExpense() {
           Save expense
         </Button>
       </form>
+    </PageReveal>
     </main>
   );
 }

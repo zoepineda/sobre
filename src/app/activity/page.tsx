@@ -1,3 +1,4 @@
+import PageReveal from "@/components/motion/PageReveal";
 import Link from "next/link";
 import { getRecentTransactions, getTopPayees } from "@/lib/queries";
 import { deleteTransaction } from "@/lib/actions";
@@ -26,7 +27,8 @@ export default async function Activity({
     .reduce((s, t) => s + -t.amount, 0);
 
   return (
-    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-3xl space-y-4">
+    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-3xl">
+      <PageReveal className="space-y-4">
       <div className="pt-3 lg:pt-0 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-bold">Activity</h1>
         <form action="/activity" className="flex items-center gap-1.5 lg:gap-2">
@@ -129,6 +131,7 @@ export default async function Activity({
             ))}
         </Card>
       )}
+    </PageReveal>
     </main>
   );
 }

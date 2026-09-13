@@ -1,3 +1,4 @@
+import PageReveal from "@/components/motion/PageReveal";
 import Link from "next/link";
 import { getPayeeTransactions } from "@/lib/queries";
 import { Card } from "@/components/ui/card";
@@ -16,7 +17,8 @@ export default async function PayeePage({
   const total = txns.reduce((s, t) => s + -t.amount, 0);
 
   return (
-    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-2xl space-y-4">
+    <main className="p-4 lg:p-8 lg:mx-auto lg:max-w-2xl">
+      <PageReveal className="space-y-4">
       <header className="pt-3 lg:pt-0">
         <Link href="/activity" className="text-xs text-primary">
           ← Activity
@@ -61,6 +63,7 @@ export default async function PayeePage({
           ))}
         </Card>
       )}
+    </PageReveal>
     </main>
   );
 }

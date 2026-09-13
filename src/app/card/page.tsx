@@ -1,3 +1,4 @@
+import PageReveal from "@/components/motion/PageReveal";
 import Link from "next/link";
 import {
   getAccounts,
@@ -48,7 +49,8 @@ export default async function CardPage({
   );
 
   return (
-    <main className="p-4 lg:p-8 space-y-4">
+    <main className="p-4 lg:p-8">
+      <PageReveal className="space-y-4">
       <h1 className="pt-3 lg:pt-0 text-xl font-bold">Card payback</h1>
       {cards.length > 1 && (
         <div className="flex gap-2">
@@ -135,6 +137,7 @@ export default async function CardPage({
         </form>
       )}
       </div>
+    </PageReveal>
     </main>
   );
 }
