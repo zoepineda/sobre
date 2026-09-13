@@ -12,7 +12,7 @@ const BRANDS: {
   cardH?: number; // knockout height on cards (px) — compact marks get a boost
   nativeCard?: true; // render in its own color on cards (skip the white knockout)
 }[] = [
-  { match: /\bbpi\b/i, logo: "bpi.svg", color: "#b11116", cardH: 30 },
+  { match: /\bbpi\b/i, logo: "bpi.svg", color: "#b11116", cardH: 20 },
   { match: /\bbdo\b/i, logo: "bdo.svg", color: "#0b2972" },
   { match: /metrobank|metro\s*bank/i, logo: "metrobank.svg", color: "#023184" },
   { match: /landbank|land\s*bank/i, logo: "landbank.svg", color: "#1cb14d", cardH: 26 },
