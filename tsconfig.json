@@ -31,11 +31,13 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    ".next-test/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-test/types/**/*.ts"
+    ".next-build/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "tutorial-video"
   ]
 }
