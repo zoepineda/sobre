@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { peso, todayISO } from "@/lib/format";
+import { getSessionUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +39,7 @@ export default async function Settings({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
+  const user = await getSessionUser();
   const accounts = await getAccounts();
   const categories = await getCategories();
   const groups = await getGroups();
@@ -349,11 +351,40 @@ export default async function Settings({
       </section>
       </div>
 
-      <form action={signOut} className="pt-2">
-        <Button variant="ghost" size="sm" className="text-muted-foreground">
-          Sign out
-        </Button>
-      </form>
+      {user && (
+        <Card className="py-3 shadow-sm">
+          <CardContent className="flex items-center gap-3 px-4">
+            {user.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user.avatarUrl}
+                alt=""
+                referrerPolicy="no-referrer"
+                className="h-9 w-9 rounded-full"
+              />
+            ) : (
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary text-sm font-bold text-secondary-foreground">
+                {(user.name ?? user.email ?? "?").slice(0, 1).toUpperCase()}
+              </span>
+            )}
+            <span className="min-w-0 flex-1">
+              {user.name && (
+                <span className="block truncate text-sm font-semibold">
+                  {user.name}
+                </span>
+              )}
+              <span className="block truncate text-[11px] text-muted-foreground">
+                {user.email}
+              </span>
+            </span>
+            <form action={signOut}>
+              <Button variant="secondary" size="sm">
+                Sign out
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      )}
     </main>
   );
 }
