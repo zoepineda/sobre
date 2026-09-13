@@ -196,7 +196,14 @@ export async function createCategory(formData: FormData) {
   const uid = await getUserId();
   const name = ((formData.get("name") as string) || "").trim();
   if (!name) return;
-  await sql`INSERT INTO categories (user_id, name) VALUES (${uid}, ${name})`;
+  const icon = ((formData.get("icon") as string) || "").trim();
+  const groupId = Number(formData.get("group_id")) || null;
+  const target = toCentavos((formData.get("payday_target") as string) || "0");
+  const accountId = Number(formData.get("payday_account_id")) || null;
+  await sql`
+    INSERT INTO categories (user_id, name, icon, group_id, payday_target, payday_account_id)
+    VALUES (${uid}, ${name}, ${icon}, ${groupId},
+            ${Number.isFinite(target) && target > 0 ? target : 0}, ${accountId})`;
   done("/settings");
 }
 

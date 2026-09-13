@@ -12,6 +12,7 @@ import {
 } from "@/lib/actions";
 import AddAccountForm from "@/components/AddAccountForm";
 import AddDialog from "@/components/AddDialog";
+import AddEnvelopeForm from "@/components/AddEnvelopeForm";
 import ArchiveDelete from "@/components/ArchiveDelete";
 import EnvelopeList from "@/components/EnvelopeList";
 import SetupAccountList from "@/components/SetupAccountList";
@@ -179,16 +180,10 @@ export default async function Settings({
         {sectionHeader(
           "Envelopes",
           <AddDialog title="Add envelope" trigger="Envelope">
-            <form action={createCategory} className="space-y-3">
-              <Input
-                name="name"
-                placeholder="e.g. Travel fund, Friends"
-                required
-              />
-              <Button type="submit" className="w-full">
-                Add envelope
-              </Button>
-            </form>
+            <AddEnvelopeForm
+              groups={groups.map((g) => ({ id: g.id, name: g.name }))}
+              accounts={accounts.map((a) => ({ id: a.id, name: a.name }))}
+            />
           </AddDialog>
         )}
         <EnvelopeList
