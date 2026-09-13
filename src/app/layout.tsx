@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "lineicons/dist/lineicons.css";
+import { Analytics } from "@vercel/analytics/next";
 import BottomNav from "@/components/BottomNav";
 import { getSessionUser } from "@/lib/supabase/server";
 import { Fraunces, Geist } from "next/font/google";
@@ -38,6 +39,7 @@ export default async function RootLayout({
           <div className="mx-auto max-w-md lg:max-w-5xl">{children}</div>
         </div>
         <BottomNav user={user} />
+        <Analytics />
       </body>
     </html>
   );
