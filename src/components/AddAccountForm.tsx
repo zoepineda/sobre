@@ -48,14 +48,16 @@ export default function AddAccountForm() {
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // alphabetical list shows on focus right away; typing narrows it.
+  // capped at 5 so it never overflows the dialog on tall phones.
   const q = name.trim().toLowerCase();
-  const matches =
-    q.length > 0
-      ? KNOWN.filter(
-          (k) =>
-            k.name.toLowerCase().includes(q) && k.name.toLowerCase() !== q
-        ).slice(0, 6)
-      : [];
+  const matches = KNOWN.filter(
+    (k) =>
+      q.length === 0 ||
+      (k.name.toLowerCase().includes(q) && k.name.toLowerCase() !== q)
+  )
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .slice(0, 5);
   const showList = open && matches.length > 0;
 
   function pick(k: { name: string; type: string }) {
@@ -83,6 +85,7 @@ export default function AddAccountForm() {
             setOpen(true);
             setFocusIdx(-1);
           }}
+          onFocus={() => setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 120)}
           onKeyDown={(e) => {
             if (!showList) return;
