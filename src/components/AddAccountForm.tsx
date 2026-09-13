@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -47,17 +47,24 @@ export default function AddAccountForm() {
   const [focusIdx, setFocusIdx] = useState(-1);
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+
+  // keep the keyboard-focused option visible inside the scrolling list
+  useEffect(() => {
+    if (focusIdx < 0) return;
+    listRef.current
+      ?.querySelectorAll("li")
+      [focusIdx]?.scrollIntoView({ block: "nearest" });
+  }, [focusIdx]);
 
   // alphabetical list shows on focus right away; typing narrows it.
-  // capped at 5 so it never overflows the dialog on tall phones.
+  // full list stays available — the box just scrolls past ~5 rows.
   const q = name.trim().toLowerCase();
   const matches = KNOWN.filter(
     (k) =>
       q.length === 0 ||
       (k.name.toLowerCase().includes(q) && k.name.toLowerCase() !== q)
-  )
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .slice(0, 5);
+  ).sort((a, b) => a.name.localeCompare(b.name));
   const showList = open && matches.length > 0;
 
   function pick(k: { name: string; type: string }) {
@@ -105,8 +112,9 @@ export default function AddAccountForm() {
         />
         {showList && (
           <ul
+            ref={listRef}
             role="listbox"
-            className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border bg-popover shadow-md"
+            className="absolute z-20 mt-1 max-h-[210px] w-full overflow-y-auto rounded-lg border bg-popover shadow-md"
           >
             {matches.map((k, i) => (
               <li key={k.name} role="option" aria-selected={i === focusIdx}>
