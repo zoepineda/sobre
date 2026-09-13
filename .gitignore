@@ -7,3 +7,4 @@ next-env.d.ts
 certificates/
 .next-test/
 .DS_Store
+tutorial-video/out/
