@@ -48,16 +48,18 @@ export default function AccountCard({
       )}
       <div className="relative flex items-start justify-between">
         <div>
-          {brandCardLogo(name) ? (
+          {brandCardLogo(name, type) ? (
             // white knockout, like real card printing
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={`/brands/${brandCardLogo(name)!.logo}`}
+              src={`/brands/${brandCardLogo(name, type)!.logo}`}
               alt={name}
               className="w-auto max-w-[110px] object-contain object-left"
               style={{
-                height: brandCardLogo(name)!.height,
-                filter: "brightness(0) invert(1)",
+                height: brandCardLogo(name, type)!.height,
+                filter: brandCardLogo(name, type)!.knockout
+                  ? "brightness(0) invert(1)"
+                  : undefined,
                 opacity: 0.95,
               }}
             />

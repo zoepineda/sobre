@@ -10,6 +10,7 @@ const BRANDS: {
   chip?: BrandHit["chip"];
   raster?: true; // embedded bitmap — can't be recolored via CSS filters
   cardH?: number; // knockout height on cards (px) — compact marks get a boost
+  nativeCard?: true; // render in its own color on cards (skip the white knockout)
 }[] = [
   { match: /\bbpi\b/i, logo: "bpi.svg", color: "#b11116", cardH: 30 },
   { match: /\bbdo\b/i, logo: "bdo.svg", color: "#0b2972" },
@@ -28,7 +29,7 @@ const BRANDS: {
   { match: /ownbank|own\s*bank/i, logo: "ownbank.svg", color: "#30ec5d", chip: "dark" },
   { match: /komo/i, logo: "komo.svg", color: "#b91372", raster: true },
   { match: /gcash/i, logo: "gcash.svg", color: "#007dfe" },
-  { match: /maya/i, logo: "maya.svg", color: "#2fdf75", chip: "dark" },
+  { match: /maya/i, logo: "maya.svg", color: "#2fdf75", chip: "dark", nativeCard: true },
   { match: /grab/i, logo: "grabpay.svg", color: "#00b14f" },
   { match: /shopee/i, logo: "shopeepay.svg", color: "#ee4d2d" },
   { match: /coins/i, logo: "coins-ph.svg", color: "#2f6fdb" },
@@ -49,12 +50,16 @@ export function brandLogo(name: string): BrandHit | null {
 // logo usable as a white-knockout mark on card gradients (pure vector only —
 // raster-embedded logos would turn into solid white blobs under the filter)
 export function brandCardLogo(
-  name: string
-): { logo: string; height: number } | null {
+  name: string,
+  type?: string
+): { logo: string; height: number; knockout: boolean } | null {
   const hit = BRANDS.find((b) => b.match.test(name));
-  return hit && !hit.raster
-    ? { logo: hit.logo, height: hit.cardH ?? 18 }
-    : null;
+  if (!hit || hit.raster) return null;
+  // native color only where the brand's own mark reads on the card
+  // (e.g. Maya's mint green on the black wallet card — but the credit
+  // card variant stays a white knockout to match its muted styling)
+  const knockout = !(hit.nativeCard && type !== "credit_card");
+  return { logo: hit.logo, height: hit.cardH ?? 18, knockout };
 }
 
 export function brandColor(name: string, type: string): string {

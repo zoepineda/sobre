@@ -57,16 +57,18 @@ function Row({ account }: { account: Acct }) {
       }
     >
       <div className="select-none">
-        {brandCardLogo(account.name) ? (
+        {brandCardLogo(account.name, account.type) ? (
           // white knockout, matching the Home cards
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={`/brands/${brandCardLogo(account.name)!.logo}`}
+            src={`/brands/${brandCardLogo(account.name, account.type)!.logo}`}
             alt={account.name}
             className="w-auto max-w-[100px] object-contain object-left"
             style={{
-              height: Math.round(brandCardLogo(account.name)!.height * 0.8),
-              filter: "brightness(0) invert(1)",
+              height: Math.round(brandCardLogo(account.name, account.type)!.height * 0.8),
+              filter: brandCardLogo(account.name, account.type)!.knockout
+                ? "brightness(0) invert(1)"
+                : undefined,
               opacity: 0.95,
             }}
           />
