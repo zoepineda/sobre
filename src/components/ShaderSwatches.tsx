@@ -6,14 +6,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import HueWheel from "@/components/HueWheel";
+import ColorPicker from "@/components/ColorPicker";
 import {
   PLAIN,
   SHADER_DEFS,
   recolor,
-  setCashHue,
+  setCashColor,
   setShaderChoice,
-  useCashHue,
+  useCashColor,
   useCashPalette,
   useShaderChoice,
 } from "@/lib/paperShaders";
@@ -24,7 +24,7 @@ const FILL = { position: "absolute" as const, inset: 0, width: "100%", height: "
 // Shares the global shader store, so Setup's picker stays in sync.
 export default function ShaderSwatches() {
   const choice = useShaderChoice();
-  const hue = useCashHue();
+  const color = useCashColor();
   const palette = useCashPalette();
   const [open, setOpen] = useState(false);
 
@@ -87,25 +87,25 @@ export default function ShaderSwatches() {
             <p className="text-[11px] font-medium text-muted-foreground">
               Card color
             </p>
-            {hue !== null && (
+            {color !== null && (
               <button
                 type="button"
-                onClick={() => setCashHue(null)}
+                onClick={() => setCashColor(null)}
                 className="text-[10px] font-medium text-primary"
               >
                 Reset to Pine
               </button>
             )}
           </div>
-          <div className="flex items-center gap-4">
-            <HueWheel hue={hue} onChange={setCashHue} />
-            <div className="space-y-1.5">
+          <div className="flex items-start gap-4">
+            <ColorPicker color={color} onChange={setCashColor} />
+            <div className="space-y-1.5 pt-1">
               <span
-                className="block h-10 w-16 rounded-md shadow-sm"
+                className="block h-10 w-14 rounded-md shadow-sm"
                 style={{ background: palette[1] }}
               />
               <p className="text-center text-[10px] text-muted-foreground">
-                {hue === null ? "Pine" : `Hue ${hue}°`}
+                {color === null ? "Pine" : palette[1]}
               </p>
             </div>
           </div>

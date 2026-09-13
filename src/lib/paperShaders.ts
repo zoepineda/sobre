@@ -125,14 +125,19 @@ export function useShaderChoice(): string {
   return choice;
 }
 
-// ── custom cash-card hue ──
-// null = the default Pine palette. A picked hue rebuilds the same
-// palette structure (mid / dark / light / darkest / lighter) so shaders
-// and text contrast behave exactly like the pine original.
-const HUE_KEY = "cash-hue";
-const HUE_EVENT = "cash-hue-change";
+// ── custom cash-card color ──
+// null = the default Pine palette. A picked color becomes the card base,
+// and the rest of the palette (mid / light / darkest / lighter) is derived
+// with the same relationships as the pine original, so shaders and white
+// text keep working at any hue.
+export type CashColor = { h: number; s: number; l: number };
 
-function hslToHex(h: number, s: number, l: number): string {
+const COLOR_KEY = "cash-color";
+const COLOR_EVENT = "cash-color-change";
+const clamp = (v: number, lo: number, hi: number) =>
+  Math.min(hi, Math.max(lo, v));
+
+export function hslToHex(h: number, s: number, l: number): string {
   const a = (s / 100) * Math.min(l / 100, 1 - l / 100);
   const f = (n: number) => {
     const k = (n + h / 30) % 12;
@@ -144,37 +149,55 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${f(0)}${f(8)}${f(4)}`;
 }
 
-export function paletteFromHue(h: number): string[] {
+export function paletteFromColor(c: CashColor): string[] {
+  const { h, s } = c;
+  // base lightness clamped so white text on the card stays readable
+  const l = clamp(c.l, 6, 62);
   return [
-    hslToHex(h, 40, 31), // mid (≈ #2f6f4f)
-    hslToHex(h, 40, 20), // dark card base (≈ #1e4633)
-    hslToHex(h, 34, 48), // light (≈ #4fa878)
-    hslToHex(h, 47, 10), // darkest (≈ #0d241a)
-    hslToHex(h, 32, 55), // lighter (≈ #67b08c)
+    hslToHex(h, s, clamp(l + 11, 0, 78)), // mid
+    hslToHex(h, s, l), // card base
+    hslToHex(h, clamp(s * 0.85, 0, 100), clamp(l + 28, 0, 86)), // light
+    hslToHex(h, clamp(s * 1.18, 0, 100), clamp(l - 10, 4, 100)), // darkest
+    hslToHex(h, clamp(s * 0.8, 0, 100), clamp(l + 35, 0, 92)), // lighter
   ];
 }
 
-export function setCashHue(h: number | null) {
-  if (h === null) localStorage.removeItem(HUE_KEY);
-  else localStorage.setItem(HUE_KEY, String(Math.round(h)));
-  window.dispatchEvent(new CustomEvent(HUE_EVENT, { detail: h }));
+export function setCashColor(c: CashColor | null) {
+  if (c === null) localStorage.removeItem(COLOR_KEY);
+  else
+    localStorage.setItem(
+      COLOR_KEY,
+      `${Math.round(c.h)},${Math.round(c.s)},${Math.round(c.l)}`
+    );
+  window.dispatchEvent(new CustomEvent(COLOR_EVENT, { detail: c }));
 }
 
-export function useCashHue(): number | null {
-  const [hue, setHue] = useState<number | null>(null);
+function parseColor(stored: string | null): CashColor | null {
+  if (!stored) return null;
+  const [h, s, l] = stored.split(",").map(Number);
+  return [h, s, l].every(Number.isFinite) ? { h, s, l } : null;
+}
+
+export function useCashColor(): CashColor | null {
+  const [color, setColor] = useState<CashColor | null>(null);
   useEffect(() => {
-    const stored = localStorage.getItem(HUE_KEY);
-    setHue(stored === null ? null : Number(stored));
+    // migrate the short-lived hue-only format
+    const oldHue = localStorage.getItem("cash-hue");
+    if (oldHue !== null && localStorage.getItem(COLOR_KEY) === null) {
+      localStorage.setItem(COLOR_KEY, `${Number(oldHue)},40,20`);
+      localStorage.removeItem("cash-hue");
+    }
+    setColor(parseColor(localStorage.getItem(COLOR_KEY)));
     const onChange = (e: Event) =>
-      setHue((e as CustomEvent<number | null>).detail);
-    window.addEventListener(HUE_EVENT, onChange);
-    return () => window.removeEventListener(HUE_EVENT, onChange);
+      setColor((e as CustomEvent<CashColor | null>).detail);
+    window.addEventListener(COLOR_EVENT, onChange);
+    return () => window.removeEventListener(COLOR_EVENT, onChange);
   }, []);
-  return hue;
+  return color;
 }
 
-/** Active cash-card palette: custom hue when set, Pine otherwise. */
+/** Active cash-card palette: custom color when set, Pine otherwise. */
 export function useCashPalette(): string[] {
-  const hue = useCashHue();
-  return hue === null ? PINE : paletteFromHue(hue);
+  const color = useCashColor();
+  return color === null ? PINE : paletteFromColor(color);
 }
