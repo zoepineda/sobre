@@ -9,16 +9,17 @@ const BRANDS: {
   color: string; // representative solid brand color, for tints
   chip?: BrandHit["chip"];
   raster?: true; // embedded bitmap — can't be recolored via CSS filters
+  cardH?: number; // knockout height on cards (px) — compact marks get a boost
 }[] = [
-  { match: /\bbpi\b/i, logo: "bpi.svg", color: "#b11116" },
+  { match: /\bbpi\b/i, logo: "bpi.svg", color: "#b11116", cardH: 30 },
   { match: /\bbdo\b/i, logo: "bdo.svg", color: "#0b2972" },
   { match: /metrobank|metro\s*bank/i, logo: "metrobank.svg", color: "#023184" },
-  { match: /landbank|land\s*bank/i, logo: "landbank.svg", color: "#1cb14d" },
+  { match: /landbank|land\s*bank/i, logo: "landbank.svg", color: "#1cb14d", cardH: 26 },
   { match: /security\s*bank/i, logo: "security-bank.svg", color: "#0168b3" },
   { match: /\bpnb\b/i, logo: "pnb.svg", color: "#10357f" },
-  { match: /\brcbc\b/i, logo: "rcbc.svg", color: "#4892cf" },
+  { match: /\brcbc\b/i, logo: "rcbc.svg", color: "#4892cf", cardH: 26 },
   { match: /union\s*bank/i, logo: "unionbank.svg", color: "#f26722" },
-  { match: /\bcimb\b/i, logo: "cimb.svg", color: "#dc241f", chip: "red" },
+  { match: /\bcimb\b/i, logo: "cimb.svg", color: "#dc241f", chip: "red", cardH: 26 },
   { match: /maribank|mari\s*bank/i, logo: "maribank.svg", color: "#ff7a1a" },
   { match: /gotyme|go\s*tyme/i, logo: "gotyme.svg", color: "#00c9c0" },
   { match: /tonik/i, logo: "tonik.svg", color: "#7657f8" },
@@ -47,9 +48,13 @@ export function brandLogo(name: string): BrandHit | null {
 
 // logo usable as a white-knockout mark on card gradients (pure vector only —
 // raster-embedded logos would turn into solid white blobs under the filter)
-export function brandCardLogo(name: string): string | null {
+export function brandCardLogo(
+  name: string
+): { logo: string; height: number } | null {
   const hit = BRANDS.find((b) => b.match.test(name));
-  return hit && !hit.raster ? hit.logo : null;
+  return hit && !hit.raster
+    ? { logo: hit.logo, height: hit.cardH ?? 18 }
+    : null;
 }
 
 export function brandColor(name: string, type: string): string {

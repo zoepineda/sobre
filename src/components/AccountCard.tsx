@@ -52,10 +52,14 @@ export default function AccountCard({
             // white knockout, like real card printing
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={`/brands/${brandCardLogo(name)}`}
+              src={`/brands/${brandCardLogo(name)!.logo}`}
               alt={name}
-              className="h-4.5 w-auto max-w-[110px] object-contain object-left"
-              style={{ filter: "brightness(0) invert(1)", opacity: 0.95 }}
+              className="w-auto max-w-[110px] object-contain object-left"
+              style={{
+                height: brandCardLogo(name)!.height,
+                filter: "brightness(0) invert(1)",
+                opacity: 0.95,
+              }}
             />
           ) : (
             <p className="text-sm font-bold leading-tight">{name}</p>

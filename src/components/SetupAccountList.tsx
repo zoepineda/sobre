@@ -22,6 +22,7 @@ import { CSS } from "@dnd-kit/utilities";
 import ArchiveDelete from "@/components/ArchiveDelete";
 import { Card } from "@/components/ui/card";
 import { archiveAccount, reorderAccounts } from "@/lib/actions";
+import { brandCardLogo } from "@/lib/brandLogos";
 import { cardStyle } from "@/lib/cardStyles";
 import { peso } from "@/lib/format";
 
@@ -56,8 +57,23 @@ function Row({ account }: { account: Acct }) {
       }
     >
       <div className="select-none">
-        <p className="text-sm font-medium">{account.name}</p>
-        <p className="text-[11px] uppercase tracking-wide" style={{ color: s.sub }}>
+        {brandCardLogo(account.name) ? (
+          // white knockout, matching the Home cards
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={`/brands/${brandCardLogo(account.name)!.logo}`}
+            alt={account.name}
+            className="w-auto max-w-[100px] object-contain object-left"
+            style={{
+              height: Math.round(brandCardLogo(account.name)!.height * 0.8),
+              filter: "brightness(0) invert(1)",
+              opacity: 0.95,
+            }}
+          />
+        ) : (
+          <p className="text-sm font-medium">{account.name}</p>
+        )}
+        <p className="mt-0.5 text-[11px] uppercase tracking-wide" style={{ color: s.sub }}>
           {account.type.replace("_", " ")} · {peso(account.balance)}
         </p>
       </div>
