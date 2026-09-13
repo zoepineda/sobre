@@ -32,12 +32,7 @@ const STEPS: { target: string | null; title: string; body: string }[] = [
   {
     target: "bills",
     title: "Recurring bills",
-    body: "Bills you pay every month become a checklist on Home. Ticking one logs the expense from the right account and envelope automatically — no double entry.",
-  },
-  {
-    target: "appearance",
-    title: "Make it yours",
-    body: "Pick the animated background for your cards — or Plain if you're saving battery. That's the tour! Log income on the Income page and tap “Log payday” to fill every envelope in one go.",
+    body: "Bills you pay every month become a checklist on Home. Ticking one logs the expense from the right account and envelope automatically — no double entry. That's the tour! Log income on the Income page and tap “Log payday” to fill every envelope in one go. (Psst: the palette button on the Total-cash card restyles your cards.)",
   },
 ];
 

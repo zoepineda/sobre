@@ -16,7 +16,6 @@ import ArchiveDelete from "@/components/ArchiveDelete";
 import EnvelopeList from "@/components/EnvelopeList";
 import SetupAccountList from "@/components/SetupAccountList";
 import SetupTour from "@/components/SetupTour";
-import ShaderPicker from "@/components/ShaderPicker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -306,21 +305,6 @@ export default async function Settings({
         )}
       </section>
 
-      <section data-tour="appearance" className="space-y-2">
-        <h2 className="text-sm font-semibold text-muted-foreground">
-          Appearance
-        </h2>
-        <Card className="py-4 shadow-sm">
-          <CardContent className="space-y-2 px-4">
-            <p className="text-sm font-semibold">Card background</p>
-            <ShaderPicker />
-            <p className="text-[11px] text-muted-foreground">
-              Animated backdrop for the total-cash card and your bank cards.
-              Pick Plain to turn shaders off (easier on the battery).
-            </p>
-          </CardContent>
-        </Card>
-      </section>
       </div>
 
       {user && (
