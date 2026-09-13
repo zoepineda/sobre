@@ -25,12 +25,16 @@ type Account = { id: number; name: string; type: string };
 export default function IncomeSplits({
   categories,
   accounts,
+  defaultAccountId,
 }: {
   categories: Cat[];
   accounts: Account[];
+  defaultAccountId?: number;
 }) {
   const [total, setTotal] = useState("");
-  const [accountId, setAccountId] = useState(String(accounts[0]?.id ?? ""));
+  const [accountId, setAccountId] = useState(
+    String(defaultAccountId ?? accounts[0]?.id ?? "")
+  );
   const [splits, setSplits] = useState<Record<number, string>>({});
 
   // the deposit account filters the list: its own envelopes, envelopes

@@ -17,15 +17,25 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default async function Transfer() {
-  const [allAccounts, categories] = await Promise.all([
+export default async function Transfer({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string; to?: string }>;
+}) {
+  const [{ from, to }, allAccounts, categories] = await Promise.all([
+    searchParams,
     getAccounts(),
     getCategories(),
   ]);
   const accounts = allAccounts.filter((a) => a.type !== "credit_card");
+  const valid = (v?: string) =>
+    accounts.some((a) => String(a.id) === v) ? v : undefined;
 
-  const accountSelect = (name: string) => (
-    <Select name={name} defaultValue={String(accounts[0]?.id)}>
+  const accountSelect = (name: string, preselect?: string) => (
+    <Select
+      name={name}
+      defaultValue={valid(preselect) ?? String(accounts[0]?.id)}
+    >
       <SelectTrigger id={name} className="w-full">
         <SelectValue />
       </SelectTrigger>
@@ -89,7 +99,7 @@ export default async function Transfer() {
             <div className="flex gap-3">
               <div className="flex-1 space-y-1">
                 <Label htmlFor="from_account_id" className="text-xs text-muted-foreground">Account</Label>
-                {accountSelect("from_account_id")}
+                {accountSelect("from_account_id", from)}
               </div>
               <div className="flex-1 space-y-1">
                 <Label htmlFor="from_category_id" className="text-xs text-muted-foreground">
@@ -106,7 +116,7 @@ export default async function Transfer() {
             <div className="flex gap-3">
               <div className="flex-1 space-y-1">
                 <Label htmlFor="to_account_id" className="text-xs text-muted-foreground">Account</Label>
-                {accountSelect("to_account_id")}
+                {accountSelect("to_account_id", to)}
               </div>
               <div className="flex-1 space-y-1">
                 <Label htmlFor="to_category_id" className="text-xs text-muted-foreground">

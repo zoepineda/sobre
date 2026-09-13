@@ -9,12 +9,20 @@ import { Label } from "@/components/ui/label";
 
 export const dynamic = "force-dynamic";
 
-export default async function Income() {
-  const [allAccounts, categories] = await Promise.all([
+export default async function Income({
+  searchParams,
+}: {
+  searchParams: Promise<{ account?: string }>;
+}) {
+  const [{ account: preselect }, allAccounts, categories] = await Promise.all([
+    searchParams,
     getAccounts(),
     getCategories(),
   ]);
   const accounts = allAccounts.filter((a) => a.type !== "credit_card");
+  const defaultAccountId = accounts.some((a) => String(a.id) === preselect)
+    ? Number(preselect)
+    : undefined;
 
   const template = categories.filter(
     (c) => c.payday_target > 0 && c.payday_account_id
@@ -80,6 +88,7 @@ export default async function Income() {
             name: a.name,
             type: a.type,
           }))}
+          defaultAccountId={defaultAccountId}
         />
         <Card className="py-4 shadow-sm">
           <CardContent className="space-y-3 px-4">

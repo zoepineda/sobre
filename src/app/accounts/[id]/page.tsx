@@ -5,6 +5,7 @@ import {
   getAccountTransactions,
 } from "@/lib/queries";
 import ShaderPanel from "@/components/ShaderPanel";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { peso, prettyDate } from "@/lib/format";
 
@@ -58,6 +59,29 @@ export default async function AccountDetail({
           {account.type.replace("_", " ")}
         </p>
       </ShaderPanel>
+
+      <div className="flex gap-2">
+        {isCard ? (
+          <Button asChild variant="secondary" size="sm" className="flex-1">
+            <Link href="/card">
+              <i className="lni lni-credit-card-multiple" aria-hidden /> Pay card
+            </Link>
+          </Button>
+        ) : (
+          <>
+            <Button asChild variant="secondary" size="sm" className="flex-1">
+              <Link href={`/income?account=${account.id}`}>
+                <i className="lni lni-plus" aria-hidden /> Income
+              </Link>
+            </Button>
+            <Button asChild variant="secondary" size="sm" className="flex-1">
+              <Link href={`/transfer?to=${account.id}`}>
+                <i className="lni lni-shuffle" aria-hidden /> Move money
+              </Link>
+            </Button>
+          </>
+        )}
+      </div>
 
       <section>
         <h2 className="mb-2 text-sm font-semibold text-muted-foreground">
