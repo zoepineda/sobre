@@ -142,6 +142,29 @@ export async function addTransfer(formData: FormData) {
   done("/");
 }
 
+// One-time seeding: relabel Unassigned money into many envelopes at once.
+// Each row moves amount_<catId> within account_<catId>, so account balances
+// never change — only the envelope assignment does.
+export async function setStartingBalances(formData: FormData) {
+  const uid = await getUserId();
+  const unassigned = await ensureUnassigned(uid);
+  const lines: Line[] = [];
+  for (const [key, value] of formData.entries()) {
+    const m = /^amount_(\d+)$/.exec(key);
+    if (!m) continue;
+    const amount = toCentavos(String(value));
+    if (!Number.isFinite(amount) || amount <= 0) continue;
+    const categoryId = Number(m[1]);
+    const accountId = Number(formData.get(`account_${m[1]}`));
+    if (!accountId || categoryId === unassigned) continue;
+    lines.push({ account_id: accountId, category_id: unassigned, amount: -amount });
+    lines.push({ account_id: accountId, category_id: categoryId, amount });
+  }
+  if (lines.length === 0) return;
+  await insertTransaction(uid, "transfer", todayISO(), "Starting balances", lines);
+  done("/");
+}
+
 export async function payCard(formData: FormData) {
   const uid = await getUserId();
   const cardId = Number(formData.get("card_account_id"));

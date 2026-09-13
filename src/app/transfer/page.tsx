@@ -1,4 +1,5 @@
 import { getAccounts, getCategories } from "@/lib/queries";
+import Link from "next/link";
 import { addTransfer } from "@/lib/actions";
 import { todayISO } from "@/lib/format";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,11 @@ export default async function Transfer() {
       <h1 className="pt-3 lg:pt-0 text-xl font-bold">Move money</h1>
       <p className="text-xs text-muted-foreground">
         Between accounts, between envelopes, or both at once — e.g. topping up
-        an overspent envelope, or distributing Unassigned money.
+        an overspent envelope, or distributing Unassigned money. Seeding all
+        your envelopes at once?{" "}
+        <Link href="/starting-balances" className="font-medium text-primary">
+          Set starting balances →
+        </Link>
       </p>
       <form action={addTransfer} className="space-y-4">
         <Card className="py-4 shadow-sm">

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getAccounts, getBills, getCategories, getGroups } from "@/lib/queries";
 import {
   signOut,
@@ -208,6 +209,12 @@ export default async function Settings({
           groups={groups.map((g) => ({ id: g.id, name: g.name }))}
           accounts={accounts.map((a) => ({ id: a.id, name: a.name }))}
         />
+        <Link
+          href="/starting-balances"
+          className="block text-center text-xs font-medium text-primary"
+        >
+          Set starting balances →
+        </Link>
       </section>
 
       <section data-tour="bills" className="space-y-2">
