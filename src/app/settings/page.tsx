@@ -13,10 +13,10 @@ import {
 import AddAccountForm from "@/components/AddAccountForm";
 import AddDialog from "@/components/AddDialog";
 import ArchiveDelete from "@/components/ArchiveDelete";
+import EnvelopeList from "@/components/EnvelopeList";
 import SetupAccountList from "@/components/SetupAccountList";
 import SetupTour from "@/components/SetupTour";
 import ShaderPicker from "@/components/ShaderPicker";
-import GroupAssign from "@/components/GroupAssign";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -191,47 +191,20 @@ export default async function Settings({
             </form>
           </AddDialog>
         )}
-        {categories.length > 0 && (
-          <Card className="gap-0 divide-y divide-border/60 py-0 shadow-sm">
-            {categories.map((c) => (
-              <div
-                key={c.id}
-                className="flex items-center justify-between gap-2 px-4 py-2.5"
-              >
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-medium">
-                    {c.name}
-                    {c.is_system ? (
-                      <Badge variant="outline" className="ml-1.5 text-[11px]">
-                        built-in
-                      </Badge>
-                    ) : null}
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      {peso(c.balance)}
-                    </span>
-                  </p>
-                  {c.payday_target > 0 && (
-                    <p className="text-[11px] text-muted-foreground">
-                      {peso(c.payday_target)} /cutoff → {c.payday_account_name}
-                    </p>
-                  )}
-                </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  {!c.is_system && (
-                    <GroupAssign
-                      categoryId={c.id}
-                      groupId={c.group_id}
-                      groups={groups.map((g) => ({ id: g.id, name: g.name }))}
-                    />
-                  )}
-                  {!c.is_system && (
-                    <ArchiveDelete action={archiveCategory} id={c.id} />
-                  )}
-                </div>
-              </div>
-            ))}
-          </Card>
-        )}
+        <EnvelopeList
+          envelopes={categories.map((c) => ({
+            id: c.id,
+            name: c.name,
+            is_system: c.is_system,
+            group_id: c.group_id,
+            payday_target: c.payday_target,
+            payday_account_id: c.payday_account_id,
+            payday_account_name: c.payday_account_name,
+            balance: c.balance,
+          }))}
+          groups={groups.map((g) => ({ id: g.id, name: g.name }))}
+          accounts={accounts.map((a) => ({ id: a.id, name: a.name }))}
+        />
       </section>
 
       <section data-tour="bills" className="space-y-2">

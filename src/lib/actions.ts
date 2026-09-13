@@ -238,6 +238,25 @@ export async function setCategoryGroup(formData: FormData) {
   done("/settings");
 }
 
+// Edit an envelope in one go: name, group, payday target + home account.
+export async function updateCategory(formData: FormData) {
+  const uid = await getUserId();
+  const id = Number(formData.get("id"));
+  const name = ((formData.get("name") as string) || "").trim();
+  const groupId = Number(formData.get("group_id")) || null;
+  const target = toCentavos((formData.get("payday_target") as string) || "0");
+  const accountId = Number(formData.get("payday_account_id")) || null;
+  if (!id || !name) return;
+  await sql`
+    UPDATE categories SET
+      name = ${name},
+      group_id = ${groupId},
+      payday_target = ${Number.isFinite(target) && target > 0 ? target : 0},
+      payday_account_id = ${accountId}
+    WHERE id = ${id} AND user_id = ${uid} AND is_system = false`;
+  done("/settings");
+}
+
 export async function createBill(formData: FormData) {
   const uid = await getUserId();
   const name = ((formData.get("name") as string) || "").trim();
