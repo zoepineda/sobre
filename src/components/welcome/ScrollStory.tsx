@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import { EASE_OUT } from "@/lib/ease";
-import { SHADER_DEFS, recolor, useMotionPrefs } from "@/lib/paperShaders";
+import { PINE, SHADER_DEFS, recolor, useMotionPrefs } from "@/lib/paperShaders";
 
 // The tutorial video's scenes, rebuilt as scroll-driven sections: each
 // slide fades and rises in as it enters the viewport (once), with its
@@ -174,14 +174,26 @@ const ENVELOPES = [
 ] as const;
 
 function EnvelopePanel({ counting }: { counting: boolean }) {
+  const { reduced } = useMotionPrefs();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   return (
     <div className="mx-auto w-full max-w-sm">
       <Reveal>
-        <div className="rounded-2xl bg-pine p-5 text-white shadow-lg">
-          <p className="text-[10px] uppercase tracking-widest opacity-70">
-            Total cash
-          </p>
-          <p className="text-2xl font-bold">₱112,190.36</p>
+        <div className="relative overflow-hidden rounded-2xl bg-pine p-5 text-white shadow-lg">
+          {mounted && (
+            <WARP.Comp
+              style={FILL}
+              {...recolor(WARP.params, PINE, { still: reduced })}
+            />
+          )}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-black/30 to-transparent" />
+          <div className="relative">
+            <p className="text-[10px] uppercase tracking-widest opacity-70">
+              Total cash
+            </p>
+            <p className="text-2xl font-bold">₱112,190.36</p>
+          </div>
         </div>
       </Reveal>
       <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-lg">
