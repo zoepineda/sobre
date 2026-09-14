@@ -4,7 +4,6 @@ import BrandChip from "@/components/BrandChip";
 import LogoAnimated from "@/components/LogoAnimated";
 import PageReveal from "@/components/motion/PageReveal";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Sobre, envelope budgeting for PH wallets",
@@ -64,6 +63,39 @@ const BANKS = [
   { name: "UnionBank", type: "bank" },
 ];
 
+// The logo's own wobbly envelope, cropped out of the 48-grid mark, with a
+// paper body and the persona's icon peeking over the rim like the eyes do.
+function PersonaEnvelope({ icon, tilt }: { icon: string; tilt: number }) {
+  return (
+    <div
+      className="relative inline-block"
+      style={{ transform: `rotate(${tilt}deg)` }}
+    >
+      <i
+        className={`lni ${icon} absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 text-3xl text-primary`}
+        aria-hidden
+      />
+      <svg width="104" height="70" viewBox="7.5 18.5 34 23" fill="none" aria-hidden>
+        <path
+          d="M9.2 21.4 Q8.6 20.2 10 19.9 L23.2 19.4 L38.2 19.8 Q39.6 19.8 39.7 21.2 L40.2 37.4 Q40.3 39.5 38.4 39.6 L10.4 40.2 Q8.6 40.2 8.5 38.4 Z"
+          fill="#fff"
+          stroke="#1a1d24"
+          strokeWidth="1.6"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M9.6 21.2 L24 31 L39.3 20.8"
+          stroke="#1a1d24"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          fill="none"
+        />
+      </svg>
+    </div>
+  );
+}
+
 export default function Welcome() {
   return (
     <main className="mx-auto max-w-5xl px-5 pb-16 lg:px-8">
@@ -78,7 +110,7 @@ export default function Welcome() {
 
         {/* hero */}
         <section className="pt-2 text-center lg:pt-10">
-          <h1 className="mx-auto max-w-3xl font-heading text-5xl font-black leading-[1.05] tracking-tight lg:text-7xl">
+          <h1 className="mx-auto max-w-3xl font-heading text-[2.6rem] font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl">
             Every peso{" "}
             <span className="relative inline-block">
               <span className="absolute inset-x-0 bottom-1 -z-10 h-4 bg-amber lg:bottom-2 lg:h-6" />
@@ -120,53 +152,50 @@ export default function Welcome() {
         </section>
 
         {/* how it works */}
-        <section>
-          <h2 className="text-center font-heading text-3xl font-bold lg:text-4xl">
+        <section className="mx-auto max-w-2xl">
+          <h2 className="font-heading text-3xl font-bold lg:text-4xl">
             How it works
           </h2>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
+          <ol className="mt-10 space-y-12">
             {STEPS.map((s, i) => (
-              <Card key={s.title} className="py-6 shadow-sm">
-                <CardContent className="px-6">
-                  <div className="flex size-11 items-center justify-center rounded-xl bg-amber text-xl text-ink">
-                    <i className={`lni ${s.icon}`} aria-hidden />
-                  </div>
-                  <p className="mt-4 text-xs font-bold uppercase tracking-widest text-primary">
-                    Step {i + 1}
-                  </p>
-                  <h3 className="mt-1 font-heading text-xl font-bold">
-                    {s.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+              <li key={s.title} className="flex items-start gap-6 lg:gap-9">
+                <span
+                  aria-hidden
+                  className="-mt-3 font-heading text-7xl font-black text-amber lg:text-8xl"
+                  style={{ textShadow: "4px 4px 0 var(--color-ink)" }}
+                >
+                  {i + 1}
+                </span>
+                <div className="pt-1">
+                  <h3 className="font-heading text-2xl font-bold">{s.title}</h3>
+                  <p className="mt-2 leading-relaxed text-muted-foreground">
                     {s.body}
                   </p>
-                </CardContent>
-              </Card>
+                </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </section>
 
-        {/* who it's for */}
+        {/* who it's for: three envelopes, addressed to their people */}
         <section>
           <h2 className="text-center font-heading text-3xl font-bold lg:text-4xl">
             Made for
           </h2>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {PERSONAS.map((p) => (
-              <Card key={p.title} className="bg-secondary/40 py-6 shadow-sm">
-                <CardContent className="px-6">
-                  <i
-                    className={`lni ${p.icon} text-3xl text-primary`}
-                    aria-hidden
-                  />
-                  <h3 className="mt-3 font-heading text-xl font-bold">
-                    {p.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {p.body}
-                  </p>
-                </CardContent>
-              </Card>
+          <div className="mt-14 flex flex-col items-center gap-14 md:flex-row md:items-start md:justify-center md:gap-8">
+            {PERSONAS.map((p, i) => (
+              <div
+                key={p.title}
+                className={`max-w-xs text-center ${i === 1 ? "md:mt-10" : ""}`}
+              >
+                <PersonaEnvelope icon={p.icon} tilt={[-3, 2, -2][i]} />
+                <h3 className="mt-4 font-heading text-xl font-bold">
+                  {p.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {p.body}
+                </p>
+              </div>
             ))}
           </div>
         </section>
