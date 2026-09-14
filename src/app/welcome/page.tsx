@@ -104,17 +104,17 @@ export default function Welcome() {
               for.
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground lg:text-xl">
-              Sobre is envelope budgeting built for the way we actually bank in
-              the Philippines: money spread across e-wallets, banks, and a
-              credit card that needs taming. Sort every peso into an envelope
-              and always know what it&apos;s for.
+              Sobre is envelope budgeting for how we actually bank in the
+              Philippines: money scattered across e-wallets, banks, and a
+              credit card that needs a little taming. Give every peso its own
+              envelope and always know exactly what it&apos;s for.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg">
                 <Link href="/login">Get started, it&apos;s free</Link>
               </Button>
               <Button asChild variant="outline" size="lg">
-                <a href="#how">See how it works ↓</a>
+                <a href="#how">Show me how ↓</a>
               </Button>
             </div>
           </section>
@@ -194,8 +194,9 @@ export default function Welcome() {
               Know where every peso lives.
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-white/75">
-              Free, private, and takes about five minutes to set up. Your money
-              stays in your banks. Sobre just keeps the map.
+              Free, private, and set up in about five minutes. Your money stays
+              right where it is. Sobre just keeps the map, and throws a little
+              confetti when you get paid.
             </p>
             <Button
               asChild
@@ -206,7 +207,7 @@ export default function Welcome() {
             </Button>
           </SectionReveal>
           <footer className="mt-14 text-center text-xs text-white/50">
-            Sobre · envelope in Tagalog · Every peso accounted for.
+            Sobre means envelope in Tagalog 💌 Every peso accounted for.
           </footer>
         </div>
       </section>

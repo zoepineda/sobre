@@ -14,19 +14,19 @@ const EASE = [...EASE_OUT] as [number, number, number, number];
 const SLIDES = [
   {
     title: "Add your accounts",
-    body: "Banks, e-wallets, cash, and your credit card. Each becomes a card in Sobre, styled like the real thing.",
+    body: "Banks, e-wallets, cash, and yes, that credit card. Each one becomes a little card in Sobre, styled like the real thing in your pocket.",
   },
   {
     title: "Sort it into envelopes",
-    body: "Envelopes work like categories, but they hold real money. Together they always equal your total cash, to the centavo.",
+    body: "Think categories, but with real money inside. Your envelopes always add up to your total cash, down to the last centavo. Nothing hides.",
   },
   {
     title: "One tap on payday",
-    body: "Log payday fills every envelope with its planned amount, in the right account, all at once.",
+    body: "Sweldo day! One tap fills every envelope with its planned amount, in the right account. Budgeting done before your coffee cools.",
   },
   {
     title: "Spend without surprises",
-    body: "Expenses come out of their envelope. Card swipes reserve that envelope's cash for payback, so the bill is never a shock.",
+    body: "Every expense comes straight out of its envelope. Swipe your card and Sobre quietly sets the payback money aside, so the statement never gets to scare you.",
   },
 ];
 
@@ -252,7 +252,7 @@ function EnvelopePanel({ counting }: { counting: boolean }) {
         ))}
         <Reveal delay={landAt(4)}>
           <div className="bg-primary/5 px-5 py-3 text-xs text-muted-foreground">
-            5 envelopes = ₱112,190.36. Always, to the centavo.
+            All 5 add up to ₱112,190.36. Every single time.
           </div>
         </Reveal>
       </div>
@@ -291,7 +291,7 @@ function PaydayMock({ counting }: { counting: boolean }) {
         >
           Log payday
         </motion.button>
-        <span className="text-xs text-muted-foreground">Go on, tap it.</span>
+        <span className="text-xs text-muted-foreground">Tap it! You know you want to.</span>
       </Reveal>
       <div className="w-full overflow-hidden rounded-2xl bg-white shadow-lg">
         {(
