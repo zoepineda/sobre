@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useReducedMotion } from "motion/react";
 import { confettiEnabled } from "@/lib/confettiPref";
+import { playSound } from "@/lib/soundPref";
 
 // Fires a confetti volley when the page loads with ?celebrate=1 (set by the
 // income actions), then strips the param so refreshes stay quiet. Skipped
@@ -20,6 +21,7 @@ export default function Celebrate({ userId }: { userId?: string }) {
     if (fired.current) return;
     fired.current = true;
 
+    playSound("success", userId);
     (async () => {
       if (!reduced && confettiEnabled(userId)) {
         const confetti = (await import("canvas-confetti")).default;

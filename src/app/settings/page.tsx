@@ -15,6 +15,7 @@ import AddEnvelopeForm from "@/components/AddEnvelopeForm";
 import ArchiveDelete from "@/components/ArchiveDelete";
 import BrandChip from "@/components/BrandChip";
 import ConfettiPref from "@/components/ConfettiPref";
+import SoundPref from "@/components/SoundPref";
 import EnvelopeOption from "@/components/EnvelopeOption";
 import EnvelopeList from "@/components/EnvelopeList";
 import SetupAccountList from "@/components/SetupAccountList";
@@ -351,8 +352,9 @@ export default async function Settings({
           Preferences
         </h2>
         <Card className="py-3 shadow-sm">
-          <CardContent className="px-4">
+          <CardContent className="space-y-4 px-4">
             <ConfettiPref userId={user?.id} />
+            <SoundPref userId={user?.id} />
           </CardContent>
         </Card>
       </section>

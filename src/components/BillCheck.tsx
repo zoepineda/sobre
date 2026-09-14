@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toggleBillPaid } from "@/lib/actions";
+import { playSound } from "@/lib/soundPref";
 
 export default function BillCheck({
   billId,
@@ -21,7 +22,10 @@ export default function BillCheck({
       <Checkbox
         id={`bill-${billId}`}
         checked={paid}
-        onCheckedChange={() => formRef.current?.requestSubmit()}
+        onCheckedChange={(v) => {
+          if (v === true) playSound("droplet");
+          formRef.current?.requestSubmit();
+        }}
         className="size-5"
         aria-label="Mark bill paid"
       />
