@@ -79,11 +79,13 @@ function PersonaEnvelope({ icon, tilt }: { icon: string; tilt: number }) {
   );
 }
 
+const CONTAINER = "mx-auto max-w-5xl px-5 lg:px-8";
+
 export default function Welcome() {
   return (
-    <main className="mx-auto max-w-5xl px-5 pb-16 lg:px-8">
-      <div className="space-y-16 lg:space-y-24">
-        {/* header */}
+    <main>
+      {/* paper band: header + hero */}
+      <div className={CONTAINER}>
         <header className="flex items-center justify-between pt-6">
           <LogoAnimated size={34} className="text-2xl" />
           <Button asChild variant="secondary" size="sm">
@@ -91,36 +93,37 @@ export default function Welcome() {
           </Button>
         </header>
 
-        {/* hero */}
         <SectionReveal>
-        <section className="pt-2 text-center lg:pt-10">
-          <h1 className="mx-auto max-w-3xl font-heading text-[2.6rem] font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl">
-            Every peso{" "}
-            <span className="relative inline-block">
-              <span className="absolute inset-x-0 bottom-1 -z-10 h-4 bg-amber lg:bottom-2 lg:h-6" />
-              accounted
-            </span>{" "}
-            for.
-          </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground lg:text-xl">
-            Sobre is envelope budgeting built for the way we actually bank in
-            the Philippines: money spread across e-wallets, banks, and a
-            credit card that needs taming. Sort every peso into an envelope
-            and always know what it&apos;s for.
-          </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button asChild size="lg">
-              <Link href="/login">Get started, it&apos;s free</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <a href="#how">See how it works ↓</a>
-            </Button>
-          </div>
-        </section>
+          <section className="pb-20 pt-14 text-center lg:pb-28 lg:pt-20">
+            <h1 className="mx-auto max-w-3xl font-heading text-[2.6rem] font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl">
+              Every peso{" "}
+              <span className="relative inline-block">
+                <span className="absolute inset-x-0 bottom-1 -z-10 h-4 bg-amber lg:bottom-2 lg:h-6" />
+                accounted
+              </span>{" "}
+              for.
+            </h1>
+            <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground lg:text-xl">
+              Sobre is envelope budgeting built for the way we actually bank in
+              the Philippines: money spread across e-wallets, banks, and a
+              credit card that needs taming. Sort every peso into an envelope
+              and always know what it&apos;s for.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+              <Button asChild size="lg">
+                <Link href="/login">Get started, it&apos;s free</Link>
+              </Button>
+              <Button asChild variant="outline" size="lg">
+                <a href="#how">See how it works ↓</a>
+              </Button>
+            </div>
+          </section>
         </SectionReveal>
+      </div>
 
-        {/* how it works: the tour, as scroll-driven slides */}
-        <section id="how" className="scroll-mt-10">
+      {/* white band: the tour */}
+      <section id="how" className="scroll-mt-10 border-y border-border/50 bg-white">
+        <div className={`${CONTAINER} py-16 lg:py-24`}>
           <SectionReveal>
             <h2 className="font-heading text-3xl font-bold lg:text-4xl">
               How it works
@@ -129,77 +132,84 @@ export default function Welcome() {
           <div className="mt-14">
             <ScrollStory />
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* who it's for: three envelopes, addressed to their people */}
-        <SectionReveal>
-        <section>
-          <h2 className="text-center font-heading text-3xl font-bold lg:text-4xl">
-            Made for
-          </h2>
-          <div className="mt-14 flex flex-col items-center gap-14 md:flex-row md:items-start md:justify-center md:gap-8">
-            {PERSONAS.map((p, i) => (
-              <div
-                key={p.title}
-                className={`max-w-xs text-center ${i === 1 ? "md:mt-10" : ""}`}
-              >
-                <PersonaEnvelope icon={p.icon} tilt={[-3, 2, -2][i]} />
-                <h3 className="mt-4 font-heading text-xl font-bold">
-                  {p.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {p.body}
-                </p>
-              </div>
-            ))}
-          </div>
-        </section>
-        </SectionReveal>
+      {/* amber band: who it's for */}
+      <section className="bg-amber-soft">
+        <div className={`${CONTAINER} py-16 lg:py-24`}>
+          <SectionReveal>
+            <h2 className="text-center font-heading text-3xl font-bold lg:text-4xl">
+              Made for
+            </h2>
+            <div className="mt-14 flex flex-col items-center gap-14 md:flex-row md:items-start md:justify-center md:gap-8">
+              {PERSONAS.map((p, i) => (
+                <div
+                  key={p.title}
+                  className={`max-w-xs text-center ${i === 1 ? "md:mt-10" : ""}`}
+                >
+                  <PersonaEnvelope icon={p.icon} tilt={[-3, 2, -2][i]} />
+                  <h3 className="mt-4 font-heading text-xl font-bold">
+                    {p.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-amber-ink/80">
+                    {p.body}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </SectionReveal>
+        </div>
+      </section>
 
-        {/* banks */}
-        <SectionReveal>
-        <section className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Plays nice with
-          </p>
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
-            {BANKS.map((b) => (
-              <span key={b.name} className="flex items-center gap-1.5">
-                <BrandChip name={b.name} type={b.type} />
-                <span className="text-sm text-muted-foreground">{b.name}</span>
-              </span>
-            ))}
-          </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            ...and any bank, wallet, or cash stash you name.
-          </p>
-        </section>
-        </SectionReveal>
+      {/* paper band: banks */}
+      <section>
+        <div className={`${CONTAINER} py-16 text-center lg:py-20`}>
+          <SectionReveal>
+            <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Plays nice with
+            </p>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-5 gap-y-3">
+              {BANKS.map((b) => (
+                <span key={b.name} className="flex items-center gap-1.5">
+                  <BrandChip name={b.name} type={b.type} />
+                  <span className="text-sm text-muted-foreground">
+                    {b.name}
+                  </span>
+                </span>
+              ))}
+            </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              ...and any bank, wallet, or cash stash you name.
+            </p>
+          </SectionReveal>
+        </div>
+      </section>
 
-        {/* closing CTA */}
-        <SectionReveal>
-        <section className="rounded-3xl bg-pine px-6 py-12 text-center text-white shadow-xl lg:py-16">
-          <h2 className="font-heading text-3xl font-bold lg:text-4xl">
-            Know where every peso lives.
-          </h2>
-          <p className="mx-auto mt-3 max-w-xl text-white/75">
-            Free, private, and takes about five minutes to set up. Your money
-            stays in your banks. Sobre just keeps the map.
-          </p>
-          <Button
-            asChild
-            size="lg"
-            className="mt-7 bg-amber text-ink hover:bg-amber/90"
-          >
-            <Link href="/login">Start budgeting →</Link>
-          </Button>
-        </section>
-        </SectionReveal>
-
-        <footer className="pb-2 text-center text-xs text-muted-foreground">
-          Sobre · envelope in Tagalog · Every peso accounted for.
-        </footer>
-      </div>
+      {/* pine band: closing CTA + footer */}
+      <section className="bg-pine text-white">
+        <div className={`${CONTAINER} py-16 text-center lg:py-20`}>
+          <SectionReveal>
+            <h2 className="font-heading text-3xl font-bold lg:text-4xl">
+              Know where every peso lives.
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-white/75">
+              Free, private, and takes about five minutes to set up. Your money
+              stays in your banks. Sobre just keeps the map.
+            </p>
+            <Button
+              asChild
+              size="lg"
+              className="mt-7 bg-amber text-ink hover:bg-amber/90"
+            >
+              <Link href="/login">Start budgeting →</Link>
+            </Button>
+          </SectionReveal>
+          <footer className="mt-14 text-center text-xs text-white/50">
+            Sobre · envelope in Tagalog · Every peso accounted for.
+          </footer>
+        </div>
+      </section>
     </main>
   );
 }
