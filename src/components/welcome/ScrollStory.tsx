@@ -54,24 +54,32 @@ function Reveal({
   );
 }
 
-/** Counts up from 0 when scrolled into view. */
-function CountUp({ to, start }: { to: number; start: boolean }) {
+/** Counts up from 0 when scrolled into view (after an optional delay). */
+function CountUp({
+  to,
+  start,
+  delay = 0,
+}: {
+  to: number;
+  start: boolean;
+  delay?: number;
+}) {
   const [v, setV] = useState(0);
   const reduced = useReducedMotion() ?? false;
   useEffect(() => {
     if (!start) return;
     if (reduced) return setV(to);
-    const t0 = performance.now();
+    const t0 = performance.now() + delay * 1000;
     const dur = 900;
     let raf: number;
     const tick = (t: number) => {
-      const p = Math.min(1, (t - t0) / dur);
+      const p = Math.min(1, Math.max(0, (t - t0) / dur));
       setV(to * (1 - Math.pow(1 - p, 3)));
       if (p < 1) raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [start, to, reduced]);
+  }, [start, to, reduced, delay]);
   return (
     <>
       ₱
@@ -173,12 +181,44 @@ const ENVELOPES = [
   ["Wants Budget", 2480.12],
 ] as const;
 
+// nugget flight timing: launch beat per row, flight time, landing = count start
+const NUGGET = { first: 0.35, per: 0.38, flight: 0.55, top0: 112, step: 45 };
+
 function EnvelopePanel({ counting }: { counting: boolean }) {
   const { reduced } = useMotionPrefs();
+  const prefersReduced = useReducedMotion() ?? false;
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  const landAt = (i: number) => NUGGET.first + i * NUGGET.per + NUGGET.flight;
   return (
-    <div className="mx-auto w-full max-w-sm">
+    <div className="relative mx-auto w-full max-w-sm">
+      {/* amber money-nuggets: fly from the total into their envelope rows */}
+      {counting &&
+        !prefersReduced &&
+        ENVELOPES.map(([name, amount], i) => (
+          <motion.div
+            key={`nugget-${name}`}
+            className="pointer-events-none absolute z-10 whitespace-nowrap rounded-full bg-amber px-3 py-1 text-xs font-bold text-ink shadow-md"
+            initial={{ top: 40, left: "38%", opacity: 0 }}
+            animate={{
+              top: [40, NUGGET.top0 + i * NUGGET.step],
+              left: ["38%", "68%"],
+              opacity: [0, 1, 1, 0],
+            }}
+            transition={{
+              delay: NUGGET.first + i * NUGGET.per,
+              duration: NUGGET.flight,
+              ease: "easeIn",
+              opacity: { times: [0, 0.2, 0.85, 1], duration: NUGGET.flight },
+            }}
+          >
+            ₱
+            {amount.toLocaleString("en-PH", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </motion.div>
+        ))}
       <Reveal>
         <div className="relative overflow-hidden rounded-2xl bg-pine p-5 text-white shadow-lg">
           {mounted && (
@@ -198,16 +238,20 @@ function EnvelopePanel({ counting }: { counting: boolean }) {
       </Reveal>
       <div className="mt-4 overflow-hidden rounded-2xl bg-white shadow-lg">
         {ENVELOPES.map(([name, amount], i) => (
-          <Reveal key={name} delay={0.15 + i * 0.09}>
+          <Reveal key={name} delay={0.12 + i * 0.09}>
             <div className="flex items-center justify-between border-b border-border/60 px-5 py-3 text-sm last:border-b-0">
               <span>{name}</span>
               <span className="font-semibold tabular-nums">
-                <CountUp to={amount} start={counting} />
+                <CountUp
+                  to={amount}
+                  start={counting}
+                  delay={NUGGET.first + i * NUGGET.per + NUGGET.flight}
+                />
               </span>
             </div>
           </Reveal>
         ))}
-        <Reveal delay={0.62}>
+        <Reveal delay={landAt(4)}>
           <div className="bg-primary/5 px-5 py-3 text-xs text-muted-foreground">
             5 envelopes = ₱112,190.36. Always, to the centavo.
           </div>
