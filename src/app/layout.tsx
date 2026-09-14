@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import "lineicons/dist/lineicons.css";
 import { Analytics } from "@vercel/analytics/next";
+import AppShell from "@/components/AppShell";
 import BottomNav from "@/components/BottomNav";
 import { getSessionUser } from "@/lib/supabase/server";
 import { Fraunces, Geist } from "next/font/google";
@@ -35,9 +36,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", geist.variable, fraunces.variable)}>
       <body className="antialiased">
-        <div className="min-h-dvh pb-24 lg:pb-10 lg:pl-60">
-          <div className="mx-auto max-w-md lg:max-w-5xl">{children}</div>
-        </div>
+        <AppShell>{children}</AppShell>
         <BottomNav user={user} />
         <Analytics />
       </body>

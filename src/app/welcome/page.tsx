@@ -3,6 +3,7 @@ import Link from "next/link";
 import BrandChip from "@/components/BrandChip";
 import LogoAnimated from "@/components/LogoAnimated";
 import PageReveal from "@/components/motion/PageReveal";
+import ScrollStory from "@/components/welcome/ScrollStory";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
@@ -13,24 +14,6 @@ export const metadata: Metadata = {
 
 // Public landing page: what Sobre is and who it's for. Logged-out visits
 // to / land here; everything routes to /login to get started.
-
-const STEPS = [
-  {
-    icon: "lni-credit-card-multiple",
-    title: "Add your accounts",
-    body: "Banks, e-wallets, cash, and your credit card. Each becomes a card in Sobre, styled like the real thing.",
-  },
-  {
-    icon: "lni-envelope-1",
-    title: "Sort it into envelopes",
-    body: "Envelopes work like categories, but they hold real money. Together they always equal your total cash, to the centavo.",
-  },
-  {
-    icon: "lni-hand-taking-dollar",
-    title: "One tap on payday",
-    body: "Log payday fills every envelope with its planned amount, in the right account. Then just spend from envelopes.",
-  },
-];
 
 const PERSONAS = [
   {
@@ -129,52 +112,19 @@ export default function Welcome() {
               <Link href="/login">Get started, it&apos;s free</Link>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <a href="#tour">
-                <i className="lni lni-play" aria-hidden /> Watch the 45-second
-                tour
-              </a>
+              <a href="#how">See how it works ↓</a>
             </Button>
           </div>
         </section>
 
-        {/* tutorial video */}
-        <section id="tour" className="scroll-mt-8">
-          <div className="overflow-hidden rounded-2xl bg-pine shadow-xl">
-            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-            <video
-              src="/tutorial.mp4"
-              controls
-              playsInline
-              preload="metadata"
-              className="w-full"
-            />
-          </div>
-        </section>
-
-        {/* how it works */}
-        <section className="mx-auto max-w-2xl">
+        {/* how it works: the tour, as scroll-driven slides */}
+        <section id="how" className="scroll-mt-10">
           <h2 className="font-heading text-3xl font-bold lg:text-4xl">
             How it works
           </h2>
-          <ol className="mt-10 space-y-12">
-            {STEPS.map((s, i) => (
-              <li key={s.title} className="flex items-start gap-6 lg:gap-9">
-                <span
-                  aria-hidden
-                  className="-mt-3 font-heading text-7xl font-black text-amber lg:text-8xl"
-                  style={{ textShadow: "4px 4px 0 var(--color-ink)" }}
-                >
-                  {i + 1}
-                </span>
-                <div className="pt-1">
-                  <h3 className="font-heading text-2xl font-bold">{s.title}</h3>
-                  <p className="mt-2 leading-relaxed text-muted-foreground">
-                    {s.body}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <div className="mt-14">
+            <ScrollStory />
+          </div>
         </section>
 
         {/* who it's for: three envelopes, addressed to their people */}
