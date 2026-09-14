@@ -183,7 +183,7 @@ export default function IntroLab() {
           </CardContent>
         </Card>
         <p className="mt-6 text-center text-[11px] text-muted-foreground">
-          Every peso, spoken for.
+          Every peso accounted for.
         </p>
       </motion.div>
     </main>

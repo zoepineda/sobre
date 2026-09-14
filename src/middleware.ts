@@ -26,12 +26,13 @@ export async function middleware(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims ?? null;
 
-  const isLogin =
-    request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/auth/callback");
-  if (!user && !isLogin) {
+  const path = request.nextUrl.pathname;
+  const isLogin = path.startsWith("/login") || path.startsWith("/auth/callback");
+  const isPublic = isLogin || path.startsWith("/welcome");
+  if (!user && !isPublic) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    // fresh visitors get the landing page; deep links still go to login
+    url.pathname = path === "/" ? "/welcome" : "/login";
     return NextResponse.redirect(url);
   }
   if (user && isLogin) {
@@ -43,5 +44,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|brands/|icon.svg|favicon.ico).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|brands/|tutorial.mp4|icon.svg|favicon.ico).*)",
+  ],
 };

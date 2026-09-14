@@ -59,7 +59,7 @@ export default async function Dashboard({
       <main className="p-5 pt-14 space-y-4 text-center">
         <h1 className="flex justify-center text-2xl font-bold"><Logo size={34} /></h1>
         <p className="text-muted-foreground">
-          Every peso, spoken for.
+          Every peso accounted for.
         </p>
         <Button asChild size="lg">
           <Link href="/settings">Set up accounts &amp; envelopes →</Link>
