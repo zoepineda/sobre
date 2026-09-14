@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import BrandChip from "@/components/BrandChip";
 import LogoAnimated from "@/components/LogoAnimated";
-import PageReveal from "@/components/motion/PageReveal";
+import SectionReveal from "@/components/motion/SectionReveal";
 import ScrollStory from "@/components/welcome/ScrollStory";
 import { Button } from "@/components/ui/button";
 
@@ -82,7 +82,7 @@ function PersonaEnvelope({ icon, tilt }: { icon: string; tilt: number }) {
 export default function Welcome() {
   return (
     <main className="mx-auto max-w-5xl px-5 pb-16 lg:px-8">
-      <PageReveal className="space-y-16 lg:space-y-24">
+      <div className="space-y-16 lg:space-y-24">
         {/* header */}
         <header className="flex items-center justify-between pt-6">
           <LogoAnimated size={34} className="text-2xl" />
@@ -92,6 +92,7 @@ export default function Welcome() {
         </header>
 
         {/* hero */}
+        <SectionReveal>
         <section className="pt-2 text-center lg:pt-10">
           <h1 className="mx-auto max-w-3xl font-heading text-[2.6rem] font-black leading-[1.05] tracking-tight sm:text-5xl lg:text-7xl">
             Every peso{" "}
@@ -116,18 +117,22 @@ export default function Welcome() {
             </Button>
           </div>
         </section>
+        </SectionReveal>
 
         {/* how it works: the tour, as scroll-driven slides */}
         <section id="how" className="scroll-mt-10">
-          <h2 className="font-heading text-3xl font-bold lg:text-4xl">
-            How it works
-          </h2>
+          <SectionReveal>
+            <h2 className="font-heading text-3xl font-bold lg:text-4xl">
+              How it works
+            </h2>
+          </SectionReveal>
           <div className="mt-14">
             <ScrollStory />
           </div>
         </section>
 
         {/* who it's for: three envelopes, addressed to their people */}
+        <SectionReveal>
         <section>
           <h2 className="text-center font-heading text-3xl font-bold lg:text-4xl">
             Made for
@@ -149,8 +154,10 @@ export default function Welcome() {
             ))}
           </div>
         </section>
+        </SectionReveal>
 
         {/* banks */}
+        <SectionReveal>
         <section className="text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Plays nice with
@@ -167,8 +174,10 @@ export default function Welcome() {
             ...and any bank, wallet, or cash stash you name.
           </p>
         </section>
+        </SectionReveal>
 
         {/* closing CTA */}
+        <SectionReveal>
         <section className="rounded-3xl bg-pine px-6 py-12 text-center text-white shadow-xl lg:py-16">
           <h2 className="font-heading text-3xl font-bold lg:text-4xl">
             Know where every peso lives.
@@ -185,11 +194,12 @@ export default function Welcome() {
             <Link href="/login">Start budgeting →</Link>
           </Button>
         </section>
+        </SectionReveal>
 
         <footer className="pb-2 text-center text-xs text-muted-foreground">
           Sobre · envelope in Tagalog · Every peso accounted for.
         </footer>
-      </PageReveal>
+      </div>
     </main>
   );
 }

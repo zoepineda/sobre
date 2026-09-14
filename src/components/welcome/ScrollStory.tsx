@@ -128,20 +128,19 @@ function BankStack() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   return (
-    <div className="relative mx-auto h-[300px] w-[320px] sm:w-[360px]">
+    <div className="relative mx-auto h-[310px] w-[300px] sm:h-[330px] sm:w-[340px]">
       {CARDS.map((c, i) => (
         <Reveal
           key={c.logo}
           delay={i * 0.12}
-          className="absolute w-[260px] sm:w-[290px]"
+          className="absolute left-1/2 w-[260px] -translate-x-1/2 sm:w-[290px]"
         >
           <div
             className="relative aspect-[8/5] overflow-hidden rounded-2xl p-5 shadow-xl"
             style={{
               background: c.bg,
-              marginTop: i * 62,
-              marginLeft: i * 34,
-              transform: `rotate(${[-2, 1.5, -1][i]}deg)`,
+              marginTop: i * 72,
+              transform: `translateX(${(i - 1) * 18}px) rotate(${[-3, 1.5, -1.5][i]}deg)`,
             }}
           >
             {mounted && (
@@ -261,13 +260,38 @@ function EnvelopePanel({ counting }: { counting: boolean }) {
   );
 }
 
+const PAYDAY_CONFETTI = ["#2f6f4f", "#ffb80a", "#1e4633", "#f6f6f4", "#2fdf75"];
+
 function PaydayMock({ counting }: { counting: boolean }) {
+  const [run, setRun] = useState(0);
+  const replay = async (e: React.MouseEvent) => {
+    setRun((n) => n + 1);
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const confetti = (await import("canvas-confetti")).default;
+    confetti({
+      particleCount: 70,
+      spread: 75,
+      startVelocity: 32,
+      origin: {
+        x: (rect.left + rect.width / 2) / window.innerWidth,
+        y: (rect.top + rect.height / 2) / window.innerHeight,
+      },
+      colors: PAYDAY_CONFETTI,
+      disableForReducedMotion: true,
+    });
+  };
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col items-center gap-4">
-      <Reveal>
-        <div className="rounded-xl bg-primary px-9 py-3.5 text-lg font-bold text-white shadow-lg shadow-primary/30">
+      <Reveal className="flex flex-col items-center gap-1.5">
+        <motion.button
+          type="button"
+          onClick={replay}
+          whileTap={{ scale: 0.93 }}
+          className="cursor-pointer rounded-xl bg-primary px-9 py-3.5 text-lg font-bold text-white shadow-lg shadow-primary/30 transition-colors hover:bg-primary/90"
+        >
           Log payday
-        </div>
+        </motion.button>
+        <span className="text-xs text-muted-foreground">Go on, tap it.</span>
       </Reveal>
       <div className="w-full overflow-hidden rounded-2xl bg-white shadow-lg">
         {(
@@ -282,7 +306,13 @@ function PaydayMock({ counting }: { counting: boolean }) {
             <div className="flex items-center justify-between border-b border-border/60 px-5 py-3 text-sm last:border-b-0">
               <span>{name}</span>
               <span className="font-semibold text-primary tabular-nums">
-                +<CountUp to={amount} start={counting} />
+                +
+                <CountUp
+                  key={run}
+                  to={amount}
+                  start={counting}
+                  delay={i * 0.08}
+                />
               </span>
             </div>
           </Reveal>
